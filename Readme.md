@@ -18,6 +18,7 @@ Theseus provides:
 Coming soon:
    * SSH tunnels to access remote instances
    * remote installation of Daedalus
+   * Faucet withdrawals and returns
 
 
 **How do i use it ?**
@@ -47,7 +48,7 @@ installation you need to setup an SSH tunnnel like this before you start theseus
         
 **Is there documentation**
 
-Yes , there is inline documentation 
+Yes , there is inline documentation with the code , it can be extracted with sphinx to make external documentation.
 
      cd sphinx
      make html

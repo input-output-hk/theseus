@@ -174,7 +174,7 @@ class API:
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=transaction_request.to_json())
 
         if response.status_code == 200:
-            tr = Theseus.Daedalus.TransactionResponse(response.content)
+            tr = Theseus.Daedalus.TransactionResponse(response.text)
             return tr
         else:
-            print("Error: {0}".format(response.content))
+            print("Error: {0}".format(response.text))

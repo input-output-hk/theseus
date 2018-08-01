@@ -101,6 +101,7 @@ class TransactionResponse:
         #transaction_id, creation_time, amount, status=[], inputs=[], outputs=[], direction="outgoing", confirmations=0, type="foreign"):
 
         self.transaction_id = str
+        self.confirmations = str
         self.creation_time = str
         self.amount = int
         self.status = str
@@ -115,15 +116,16 @@ class TransactionResponse:
 
     def from_json(self, raw_json):
         """ Populate this object with data from a json"""
-        parsed_json = json.dumps(raw_json)
-        self.transaction_id = parsed_json['transaction_id']
-        self.creation_time = parsed_json['creation_time']
-        self.amount = parsed_json['amount']
+        parsed_json = json.loads(raw_json)
+        self.transaction_id = parsed_json['data']['id']
+        self.confirmations = parsed_json['data']['confirmations']
+        self.creation_time = parsed_json['data']['creationTime']
+        self.amount = parsed_json['data']['amount']
+        self.inputs = parsed_json['data']['inputs']
+        self.outputs = parsed_json['data']['outputs']
+        self.direction = parsed_json['data']['direction']
+        self.type = parsed_json['data']['type']
         self.status = parsed_json['status']
-        self.inputs = parsed_json['inputs']
-        self.outputs = parsed_json['outputs']
-        self.direction = parsed_json['direction']
-        self.type = parsed_json['type']
 
     def dump(self):
         """ Dump object to a string """

@@ -7,6 +7,18 @@ Theseus battled and overcame foes that were identified with an archaic religious
 
 This tool is a python3 module and supporting code that provides a testing framework for cardano based tools.
 
+Theseus provides:
+   * Cardano wallet API Control  
+   * Daedalus Wallet Control
+   * Utilities for generating test data
+   * Logging
+   * Test Dependency packaging and delivery
+   * Inline Documentation
+
+Coming soon:
+   * SSH tunnels to access remote instances
+   * remote installation of Daedalus
+
 
 **How do i use it ?**
 

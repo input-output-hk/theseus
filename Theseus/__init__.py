@@ -1,0 +1,88 @@
+from Theseus.Logging import log_to_console, log_to_file, get_logger, timestamp
+from Theseus.Daedalus import Wallet
+from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse, Destination, Source
+
+__author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
+__doc__ = 'Theseus Test orchestration'
+__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse', 'Destination', 'Source']
+
+import atexit
+import logging
+import os
+import signal
+import sys
+import time
+
+
+def finish(reason=None):
+    """ An Exit handler: Provides a way to finish and log a reason why you finished.
+
+    If a reason is supplied then the finish will be deemed to be unexpected and a harsh
+    kill will be applied to everything potentially causing destructors not to be run.
+    In the absence of a reason a normal exit occurs in which
+    everything terminates by going out of scope which means destructors will be run.
+    finish is run by atexit at the end of a normal session.
+
+    Args:
+        reason (str) : Description of why you want to finish early
+
+    Returns:
+        None
+
+    Notes:
+        Use this when:
+            making an error you have caught be fatal
+
+            when debugging a test and you want it to finish early
+
+        Don't use this:
+            at the end of every script
+
+            in libraries unless you are very sure its not possible to continue safely
+    """
+    if reason:
+        logger = logging.getLogger('theseus.finish')
+        message = 'Exiting unexpectedly because ' + str(reason)
+        logger.info(message)
+        print("\n" + message)
+        time.sleep(1)  # pause to let the message get to disk
+        os._exit(1)  # this is harsh kill to stop anything else happening
+    else:
+        logger = logging.getLogger('theseus')
+        logger.info('Exiting')
+
+
+def _signal_handler(signal, frame):
+    try:
+        class_name = frame.f_locals['self'].__class__.__name__
+    except KeyError:
+        class_name = frame
+
+    if signal == 2:
+        signal = 'Ctrl + C'
+    else:
+        signal = 'Signal: {0}'.format(signal)
+
+    finish('Caught {0} while running in {1}'.format(signal, class_name))
+
+signal.signal(signal.SIGINT, _signal_handler)
+atexit.register(finish)
+
+# start the logging
+logger = logging.getLogger('theseus')
+logger.setLevel('DEBUG')
+
+# configure the general log , if we are called by a script then make script.daedalus.log
+log_file = 'theseus.log'
+special_cases = ['noserunner.py', 'utrunner.py']
+launching_filename = os.sep.join(sys.argv[0].split(os.sep)[-1:])
+
+if '.py' in launching_filename:
+    if launching_filename not in special_cases:
+        log_file = sys.argv[0] + '.' + log_file
+
+print("Logging to: {0}".format(log_file))
+log_to_file(log_file, 'DEBUG')
+log_to_console('INFO')
+
+logger.info('Starting up Theseus')

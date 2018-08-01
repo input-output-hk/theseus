@@ -38,14 +38,23 @@ Heres a basic example of some code to create an arbitrary amount of wallets on a
         if daedalus.create_wallet(walletname, phrase)
             print("Created Wallet: {0}").format(wallet.dump())
             
+This will connect to a local instance on 127.0.0.1:8090 , if you want to control a remote
+installation you need to setup an SSH tunnnel like this before you start theseus. 
+
+    ssh -Nv -L 127.0.0.1:8090:127.0.0.1:8090 user@remotehost.com
+    
+
+        
 **Is there documentation**
 
 Yes , there is inline documentation 
+
      cd sphinx
      make html
-     <webbrowser> build/html/index.html
      
- for more formats such as latex and pdf you can find the options at make help
+ Your documentation will be viewable at ***sphinx/build/html/index.html***
+     
+ Documentation can be output in other formats such as latex and pdf , run make help for details.
 
 
 **How is it distributed ?**

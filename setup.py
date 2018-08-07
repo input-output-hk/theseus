@@ -9,7 +9,7 @@ setup(
     author='amias channer@iohk.io',
     author_email='amias channer@iohk.io',
     description='a system for orchestrating test scenarios with Daedalus and other IOHK projects',
-    install_requires=['mnemonic', 'requests', 'urllib3'],
+    install_requires=['mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2'],
     zip_safe=True
 )
 # Work around mbcs bug in distutils.

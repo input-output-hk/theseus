@@ -1,5 +1,5 @@
-Theseus Logging module
-======================
+Logging
+=======
 
 .. automodule:: Theseus.Logging
     :members:

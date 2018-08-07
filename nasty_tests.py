@@ -1,5 +1,5 @@
 import time
-
+import typing
 import unittest2
 
 from Theseus import Daedalus
@@ -8,7 +8,7 @@ from Theseus import Daedalus
 class Hatred(unittest2.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.daedalus = Daedalus.API()
+        cls.daedalus = Daedalus.API(ssh_tunnel=True, username='admin', host="92.63.134.12")
         cls.logger = Daedalus.get_logger('hatred')
 
     def test_01_delete_all_wallets(self):
@@ -34,6 +34,7 @@ class Hatred(unittest2.TestCase):
             delete_response = self.daedalus.delete_wallet(wallet)
             self.assertTrue(delete_response, msg="wallet deleted successfully")
 
+    @unittest2.skip
     def test_03_create_evil_wallets(self):
         wallet_count = 10
         standoff = 3

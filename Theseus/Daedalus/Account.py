@@ -4,10 +4,10 @@ class Account:
     An account may have multiple wallets and instance of daedalus can currently have one account
 
     Args:
-        wallet_id (str): A walllet ID
+        wallet_id (int): A wallet ID
         account_id (int) : The account id for this account.
     """
-    def __init__(self, wallet_id , account_id=0):
+    def __init__(self, wallet_id: int, account_id: int=0):
         self._wallet_id = wallet_id
         self._account_id = account_id
 

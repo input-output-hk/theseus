@@ -1,10 +1,11 @@
 from Theseus.Logging import log_to_console, log_to_file, get_logger, timestamp
 from Theseus.Daedalus import Wallet
 from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse, Destination, Source
+from Theseus.Protocols.SSHTunnel import SSHTunnel
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
-__doc__ = 'Theseus Test orchestration'
-__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse', 'Destination', 'Source']
+__doc__ = 'Theseus Automated Test Framework'
+__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse', 'Destination', 'Source', 'get_logger', 'timestamp']
 
 import atexit
 import logging
@@ -52,7 +53,18 @@ def finish(reason=None):
         logger.info('Exiting')
 
 
-def _signal_handler(signal, frame):
+def _signal_handler(signal: int, frame: any):
+    """ signal_handler - catches exit signals and attempts to work out why and shutdown gracefully
+
+    This should not be called directyly , i will be called by the signal handler.
+    We have to be careful about looking for things that might not exist so this is run in a try
+
+
+    Args:
+        signal(int): signal number
+        frane(Frame): the frame that was running when we where called
+
+    """
     try:
         class_name = frame.f_locals['self'].__class__.__name__
     except KeyError:
@@ -65,6 +77,7 @@ def _signal_handler(signal, frame):
 
     finish('Caught {0} while running in {1}'.format(signal, class_name))
 
+
 signal.signal(signal.SIGINT, _signal_handler)
 atexit.register(finish)
 
@@ -74,7 +87,7 @@ logger.setLevel('DEBUG')
 
 # configure the general log , if we are called by a script then make script.daedalus.log
 log_file = 'theseus.log'
-special_cases = ['noserunner.py', 'utrunner.py']
+special_cases = ['noserunner.py', 'utrunner.py', 'jb-unittest_runner.py']
 launching_filename = os.sep.join(sys.argv[0].split(os.sep)[-1:])
 
 if '.py' in launching_filename:

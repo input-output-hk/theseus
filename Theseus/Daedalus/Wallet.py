@@ -29,7 +29,7 @@ class Wallet:
 
     @property
     def id(self):
-        return  self._id
+        return self._id
 
     @property
     def passphrase(self):

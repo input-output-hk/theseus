@@ -1,15 +1,58 @@
 import json
-
+from typing import Dict, List, Any , Iterable
 import requests
 
-import Theseus.Daedalus
+import Theseus
+from Theseus.Daedalus.Wallet import Wallet
+from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse
+from Theseus.Protocols.SSHTunnel import SSHTunnel
+
+# hack to stop urlib3 complaining when we turn off SSL warnings
+import urllib3
+urllib3.disable_warnings()
 
 
 class API:
-    def __init__(self, hostname='127.0.0.1:8090', version='1', ssl_verify=False):
-        self._hostname = hostname
-        self._version = version
+    """" API - Provides access to the Daedalus Wallet API
+
+    This object will provide access to an instance of the Daedalus Wallet API , this is typically configured to
+    be available on the loopback interface (127.0.0.1) for security purposes.
+
+    To access a remote instance you will need to use an SSH tunnel to forward the ports to make it accessible.
+
+    Args:
+        host(str): The Host/IP Address to connect to the API , default 127.0.0.1
+        port(int): The Port number to connection the API , default 8090
+        ssl_verify(bool): True to enable SSL Certificate verification , False to disable it, default False
+        ssh_tunnel(bool): True to configure an SSH tunnel according to additional params
+        username(str): The Username  for the SSH Connection
+        ssh_port(int): THe SSH Port to connect to for the tunnel
+        local_port(int): The local port to forward from, default 8090
+        remote_port(int): The remote port to forward to, default 8090
+        local_host(str): The local host name to forward from , default 127.0.0.1
+        remote_host(str): The remote host name to forward to , default 127.0.0.1
+        version(int): The API version number, default 1
+
+    For more info on the SSHTunnel see the Theseus.Protocol.SSHTunnel documentation.
+    The tunnel will stay up as long as this object is still in scope and will be closed down on exit.
+
+    """
+    def __init__(self, host: str='127.0.0.1', port: int=8090, ssl_verify: bool=False, ssh_tunnel: bool=True,
+                 username: str = '@', ssh_port: int=22, local_port: int=8090, remote_port: int=8090,
+                 local_host: str='127.0.0.1', remote_host: str='127.0.0.1', version: int = 1):
+        self._host = host
+        self._port = port
+
         self._ssl_verify = ssl_verify
+
+        self._ssh_tunnel = ssh_tunnel
+        self._username = username
+        self._local_port = local_port
+        self._remote_port = remote_port
+        self._local_host = local_host
+        self._remote_host = remote_host
+
+        self._version = version
 
         self.logger = Theseus.Daedalus.get_logger('API')
 
@@ -18,17 +61,25 @@ class API:
             'Content-Type': 'application/json; charset=utf-8'
         }
 
-        self._wallets = []
-        self.logger.info('Connecting to Daedalus: {0}'.format(hostname))
+        # configure an SSH tunnel if we need one
+        if ssh_tunnel is True:
+            self.tunnel = SSHTunnel(username, host, ssh_port, remote_port, local_port)
+            # if we are tunnelling then set the host and port must be local
+            self._host = '127.0.0.1'
+            # if we are tunneling the set the port to match the local_port of the ssh tunnel
+            self._port = local_port
+
+        # this is the wallet cache , a Dict of Wallets
+        self._wallets = List[Wallet]
+
+        self.logger.info('Connecting to Daedalus')
         self.fetch_wallet_list()
 
-    # TODO: add dump to file option
-
     @property
-    def wallets(self):
+    def wallets(self) -> Iterable[Wallet]:
         return self._wallets
 
-    def restore_wallet(self, name , phrase, password=False, assurance="strict"):
+    def restore_wallet(self, name: str, phrase: str, password: str, assurance: str="strict") -> Wallet:
         """ Restore a Wallet: Restores a wallet via the daedalus api using the supplied credentials
 
         This is actually just a create but for a wallet that already exists and with operation set to
@@ -46,14 +97,14 @@ class API:
         Notes:
             The created wallet object will also be appended to the local wallet cache.
         """
-        self.create_wallet(name, phrase, password, assurance, operation='restore')
+        return self.create_wallet(name, phrase, password, assurance, operation='restore')
 
-    def create_wallet(self, name, phrase, password=False, assurance="strict", operation='create'):
+    def create_wallet(self, name: str, phrase: str, password: str='', assurance: str="strict", operation: str='create') -> Wallet:
         """ Create a Wallet: Creates a wallet via the daedalus api using the supplied credentials
 
         Args:
             name (str): Wallet name
-            phrase (str): Passphrase words seperated by spaces
+            phrase (str): Passphrase words separated by spaces
             password (str): optional spending password
             assurance (str): assurance level strict or normal
             operation (str): create or restore , defaults to create
@@ -64,15 +115,17 @@ class API:
             The created wallet object will also be appended to the local wallet cache.
         """
         # make payload structure for request
-        payload = {}
-        payload['operation'] = operation
-        payload['backupPhrase'] = phrase.split()
-        payload['assuranceLevel'] = assurance
-        payload['name'] = name
+        payload: Dict[str, str] = {
+            'operation': operation,
+            'backupPhrase': phrase.split(),
+            'assuranceLevel': assurance,
+            'name': name
+        }
+
         if password:
             payload['spendingPassword'] = password
 
-        url = "https://{0}/api/v{1}/wallets".format(self._hostname, self._version)
+        url = "https://{0}:{1}/api/v{2}/wallets".format(self._host, self._port, self._version)
 
         # make request
         self.logger.info("Creating Wallet: Name: '{0}' Phrase: '{1}'".format(name, phrase))
@@ -86,12 +139,13 @@ class API:
                 response_payload = response_data['data']
                 if operation == 'restore':
                     self.logger.info('Restore status: {0}'.format(response_data['data']['syncState']))
-                wallet = Theseus.Daedalus.Wallet(id=response_payload['id'], name=name, passphrase=phrase, assurance=assurance, balance=response_payload['balance'])
+                wallet = Theseus.Daedalus.Wallet(id=response_payload['id'], name=name, passphrase=phrase,
+                                                 assurance=assurance, balance=response_payload['balance'])
                 self.wallets.append(wallet)
                 return wallet
 
-    def delete_wallet(self, wallet):
-        """ Delete a wallet: Deletes a wallet from daedalus and the local wallet cache
+    def delete_wallet(self, wallet: Wallet)-> bool:
+        """ Delete a wallet: Deletes a wallet from daedalus
 
         Args:
             wallet (Daedalus.Wallet): Wallet to delete
@@ -99,7 +153,7 @@ class API:
         Returns:
             boolean : True if wallet was deleted.
         """
-        url = "https://{0}/api/v{1}/wallets/{2}".format(self._hostname, self._version, wallet.id)
+        url = "https://{0}:{1}/api/v{2}/wallets/{3}".format(self._host, self._port, self._version, wallet.id)
         self.logger.info("Deleting wallet: {0}".format(wallet.name))
         response = requests.delete(url, verify=self._ssl_verify, headers=self.json_headers)
 
@@ -110,41 +164,50 @@ class API:
             self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
             return False
 
-    def delete_all_wallets(self):
+    def delete_all_wallets(self) -> bool:
         """ Delete all the wallets: Deletes all the wallets from daedalus and the local wallet cache"""
-        for wallet in self.daedalus.wallets:
-            self.daedalus.delete_wallet(wallet.id)
+        try:
+            for wallet in self.wallets:
+                self.delete_wallet(wallet.id)
+            return True
+        except Exception:
+            return False
 
-    def fetch_wallet_list(self, id_filter=False, balance_filter=False, sort_by=False, page=1, per_page=10):
+    def fetch_wallet_list(self, id_filter: str='', balance_filter: str='', sort_by: str='', page: int=1, per_page: int=10)-> List[Wallet]:
         """ Fetch a list of wallets: Queries the daedalus wallet and updates the local wallet cache
 
         Args:
             id_filter (str): Filter specification for wallet IDs
             balance_filter (str): Filter specification for wallet balances
             sort_by (str) : sort specification for wallet listing
+            page (int) : which page of wallet listings to show, default 1
+            per_page(int) : how many listings to show on a page, default 10
 
         Returns:
-            List: a list of Daedalus.Walled objects that where found
+            List: a List of Daedalus.Wallet objects that where found
 
         Notes:
-            TODO: this only fetches 10 because its not using pagination
+            TODO: this only fetches 10 because its not using pagination yet
             Specification syntax can be found at https://cardanodocs.com/technical/wallet/api/v1/
 
         """
-        parameters = {}
-        parameters['page'] = page
-        parameters['per_page'] = per_page
-        if id_filter:
-            parameters['id'] = id_filter
-        if balance_filter:
-            parameters['balance'] = balance_filter
-        if sort_by:
-            parameters['sort_by'] = sort_by
+        parameters: Dict[str, str] = {
+            'page': page,
+            'per_page': per_page,
+            'id': id_filter,
+            'balance': balance_filter,
+            'sort_by': sort_by
+        }
 
-        url = "https://{0}/api/v{1}/wallets".format(self._hostname,self._version)
+        url = "https://{0}:{1}/api/v{2}/wallets".format(self._host, self._port, self._version)
 
-        self.logger.debug("Fetching Wallet Listing: Url: '{0}' JSON: '{1}'".format(url,parameters))
-        response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers, params=parameters)
+        response = requests.Response
+
+        self.logger.debug("Fetching Wallet Listing: Url: '{0}' JSON: '{1}'".format(url, parameters))
+        try:
+            response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers, params=parameters)
+        except ConnectionRefusedError:
+            self.logger.error('Connection Refused: check the details and the ssh tunnel make sense')
 
         if response.status_code == 200:
             wallet_data = response.json()
@@ -155,26 +218,35 @@ class API:
             if id_filter or balance_filter or sort_by:
                 return wallets
             else:
-                self._wallets.clear()
+                self._wallets = []
                 for wallet in wallets:
                     fresh = Theseus.Daedalus.Wallet(id=wallet['id'], name=wallet['name'], balance=wallet['balance'])
                     self._wallets.append(fresh)
         else:
             self.logger.info('Wallet listed fetch failed: {0}'.format(response.status_code))
-            return {}  # an empty list
+            return List[Wallet]  # an empty list
 
     def dump_wallets(self):
+        """ Dump Wallets: dumps the contents of the wallet cache to the logs """
         for wallet in self.wallets:
             self.logger.info('Wallet Cache Dump:')
             self.logger.info(wallet.dump())
 
-    def transact(self, transaction_request):
-        url = "https://{0}/api/v{1}/transactions".format(self._hostname, self._version)
+    def transact(self, transaction_request: TransactionRequest) -> TransactionResponse:
+        """ Transact: sends your transaction request to the backend to make it happen
 
-        response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=transaction_request.to_json())
+        Args:
+            transaction_request (TransactionRequest) : A Transaction Request to enact
+
+        Returns:
+            TransactionResponse: the tran
+        """
+        url = "https://{0}/api/v{1}/transactions".format(self._host, self._version)
+
+        response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers,
+                                 data=transaction_request.to_json())
 
         if response.status_code == 200:
-            tr = Theseus.Daedalus.TransactionResponse(response.text)
-            return tr
+            return TransactionResponse(response.text)
         else:
-            print("Error: {0}".format(response.text))
+            return TransactionResponse("status:'failed'")

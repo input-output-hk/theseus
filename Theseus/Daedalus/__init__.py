@@ -6,8 +6,6 @@ from .Account import Account
 from .Transaction import TransactionRequest, TransactionResponse, Destination, Source
 
 
-import urllib3
-urllib3.disable_warnings()
 
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'

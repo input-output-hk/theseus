@@ -28,14 +28,14 @@ By default the API object will connect to a local cardano-node on 127.0.0.1:8090
 
 if you want to control a remote instance of daedalus then just forward the ports with ssh first.
 
-<explain ssh forwarding here>
 
 Subpackages
 -----------
 
 .. toctree::
     Daedalus
-    Theseus.Logging
+    Logging
+    Protocols
 
 Module contents
 ---------------

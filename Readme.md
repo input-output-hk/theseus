@@ -14,9 +14,9 @@ Theseus provides:
    * Logging
    * Test Dependency packaging and delivery
    * Inline Documentation
-
-Coming soon:
    * SSH tunnels to access remote instances
+   
+Coming soon:
    * remote installation of Daedalus
    * Faucet withdrawals and returns
 

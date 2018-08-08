@@ -21,16 +21,6 @@ WIP
    
 Coming soon:
    * remote installation of Daedalus
- 
-**How do i set it up**
-
-first make the egg file 
-
-    scripts/make_egg_file.sh
-
-Then install it and its dependecies
-
-    easy_install -a --upgrade --user dist/*.egg
 
 **How do i use it ?**
 
@@ -82,9 +72,16 @@ is similar to a jar file in that its a zip of the files with a little bit of mag
     
 An egg file should be made in the dist folder, eventually this wil be a CI process.
 
-***Install the eggs and its dependencies in virtualenv (doesnt contaminate your OS)***    
+***Install the eggs and dependencies***
+
+  This is best done in a virtualenv which is a private store of python libraries that 
+  doesnt contaminate your OS or give you versioning conflicts. These setup and activate
+  a virtualenv for theseus.
     
     virtualenv theseus -p python3
     cd theseus
     source bin/activate
+  
+  This will install the dependencies of the egg file and make it availble for use.
+  
     python3 easy_install -f "path/to/file.egg"

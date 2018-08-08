@@ -236,4 +236,4 @@ class Handler(SocketServer.BaseRequestHandler):
         peername = self.request.getpeername()
         chan.close()
         self.request.close()
-        self.logger.info("SSHTunnel closed from %r" % (peername,))
+        self.logger.debug("SSHTunnel closed from %r" % (peername,))

@@ -1,6 +1,6 @@
 import unittest2
 
-from Theseus import Daedalus, Wallet, TransactionRequest, Source, Destination
+from Theseus import Daedalus, Wallet, TransactionRequest, TransactionSource, TransactionDestination
 
 
 class TestnetHeavy(unittest2.TestCase):
@@ -24,8 +24,8 @@ class TestnetHeavy(unittest2.TestCase):
         # this is alans wallet on testnet
         destination_wallet = "DdzFFzCqrhtBvacp9mvTJCrpW51shPLBxeshaajw9sE6rP1ZqJ2zuMsNfNvLHWRBsT6RsaBy6wM3RsGVa6nrogkCojcRu8HGfT5y1zP3"
 
-        sendfrom = Source(sending_account, sending_wallet)
-        sendto = Destination(1000000, destination_wallet)
+        sendfrom = TransactionSource(sending_account, sending_wallet)
+        sendto = TransactionDestination(1000000, destination_wallet)
 
         tr = TransactionRequest(source=sendfrom, destinations=[sendto])
         response = self.daedalus.transact(tr)
@@ -43,8 +43,8 @@ class TestnetHeavy(unittest2.TestCase):
         # this is alans wallet on testnet
         destination_wallet = "DdzFFzCqrhtBvacp9mvTJCrpW51shPLBxeshaajw9sE6rP1ZqJ2zuMsNfNvLHWRBsT6RsaBy6wM3RsGVa6nrogkCojcRu8HGfT5y1zP3"
 
-        sendfrom = Source(sending_account, sending_wallet)
-        sendto = Destination(1000000, destination_wallet)
+        sendfrom = TransactionSource(sending_account, sending_wallet)
+        sendto = TransactionDestination(1000000, destination_wallet)
 
         for count in range(iterations):
             self.logger.info('Sending transaction {0} of {1}'.format(count, iterations))
@@ -67,10 +67,10 @@ class TestnetHeavy(unittest2.TestCase):
             'DdzFFzCqrhtBvacp9mvTJCrpW51shPLBxeshaajw9sE6rP1ZqJ2zuMsNfNvLHWRBsT6RsaBy6wM3RsGVa6nrogkCojcRu8HGfT5y1zP3'
         ]
 
-        sendfrom = Source(sending_account, sending_wallet)
+        sendfrom = TransactionSource(sending_account, sending_wallet)
         sendto = []
         for dest_wallet in destination_wallets:
-            sendto.append(Destination(1000000, dest_wallet))
+            sendto.append(TransactionDestination(1000000, dest_wallet))
 
         for count in range(iterations):
             self.logger.info('Sending multi transaction {0} of {1}'.format(count, iterations))

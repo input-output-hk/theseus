@@ -1,11 +1,15 @@
 from Theseus.Logging import log_to_console, log_to_file, get_logger, timestamp
 from Theseus.Daedalus import Wallet
-from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse, Destination, Source
+from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
+from Theseus.Daedalus.Address import AddressRequest, AddressResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
+from Theseus.Faucet import Faucet
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Theseus Automated Test Framework'
-__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse', 'Destination', 'Source', 'get_logger', 'timestamp']
+__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse',
+           'TransactionDestination', 'TransactionSource', 'AddressResponse', 'AddressRequest', 'Faucet',
+           'get_logger', 'timestamp']
 
 import atexit
 import logging
@@ -56,7 +60,7 @@ def finish(reason=None):
 def _signal_handler(signal: int, frame: any):
     """ signal_handler - catches exit signals and attempts to work out why and shutdown gracefully
 
-    This should not be called directyly , i will be called by the signal handler.
+    This should not be called directly , it will be called by the signal handler.
     We have to be careful about looking for things that might not exist so this is run in a try
 
 

@@ -6,6 +6,7 @@ import Theseus
 from Theseus.Daedalus.Wallet import Wallet
 from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
+from Theseus.Daedalus.Address import AddressResponse, AddressRequest
 
 # hack to stop urlib3 complaining when we turn off SSL warnings
 import urllib3
@@ -241,7 +242,7 @@ class API:
         Returns:
             TransactionResponse: the tran
         """
-        url = "https://{0}/api/v{1}/transactions".format(self._host, self._version)
+        url = "https://{0}:{1}/api/v{2}/transactions".format(self._host, self._port, self._version)
 
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers,
                                  data=transaction_request.to_json())
@@ -250,3 +251,21 @@ class API:
             return TransactionResponse(response.text)
         else:
             return TransactionResponse("status:'failed'")
+
+    def create_address(self, address_request: AddressRequest) -> AddressResponse:
+        """ Create Address: creates a new recieve address
+
+        Args:
+            address_request(AddressRequest): the address request
+
+        Returns:
+            AddressResponse: the Address resposne
+        """
+
+        url = "https://{0}:{1}/api/v{2}/addresses".format(self._host, self._port, self._version)
+
+        response = requests.post(url, data=AddressRequest)
+        if response.status_code == 200:
+            return AddressResponse(response.text)
+        else:
+            return AddressResponse('"status":"error"')

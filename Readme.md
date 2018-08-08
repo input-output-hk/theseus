@@ -8,18 +8,29 @@ Theseus battled and overcame foes that were identified with an archaic religious
 This tool is a python3 module and supporting code that provides a testing framework for cardano based tools.
 
 Theseus provides:
-   * Cardano wallet API Control  
+   * Cardano Wallet API Control  
    * Daedalus Wallet Control
    * Utilities for generating test data
    * Logging
    * Test Dependency packaging and delivery
    * Inline Documentation
    * SSH tunnels to access remote instances
+
+WIP
+   * Faucet withdrawals and returns  
    
 Coming soon:
    * remote installation of Daedalus
-   * Faucet withdrawals and returns
+ 
+**How do i set it up**
 
+first make the egg file 
+
+    scripts/make_egg_file.sh
+
+Then install it and its dependecies
+
+    easy_install -a --upgrade --user dist/*.egg
 
 **How do i use it ?**
 
@@ -39,9 +50,11 @@ Heres a basic example of some code to create an arbitrary amount of wallets on a
         if daedalus.create_wallet(walletname, phrase)
             print("Created Wallet: {0}").format(wallet.dump())
             
-This will connect to a local instance on 127.0.0.1:8090 , if you want to control a remote
-installation you need to setup an SSH tunnnel like this before you start theseus. 
+This will connect to a local instance on 127.0.0.1:8090.
 
+If you want to control a remote installation an ssh tunnel will be created automatically.
+
+   daedaus.API(host='remotehost' port=1234)
     ssh -Nv -L 127.0.0.1:8090:127.0.0.1:8090 user@remotehost.com
     
 

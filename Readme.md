@@ -45,8 +45,6 @@ This will connect to a local instance on 127.0.0.1:8090.
 If you want to control a remote installation an ssh tunnel will be created automatically.
 
     daedaus.API(host='remotehost' port=1234)
-    ssh -Nv -L 127.0.0.1:8090:127.0.0.1:8090 user@remotehost.com
-    
 
         
 **Is there documentation**

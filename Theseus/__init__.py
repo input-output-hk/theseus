@@ -4,11 +4,14 @@ from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Daedalus.Address import AddressRequest, AddressResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
 from Theseus.Faucet import Faucet
+from Theseus.Secrets import Secrets
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Theseus Automated Test Framework'
-__all__ = ['Daedalus', 'Wallet', 'TransactionRequest', 'TransactionRequest', 'TransactionResponse',
-           'TransactionDestination', 'TransactionSource', 'AddressResponse', 'AddressRequest', 'Faucet',
+__all__ = ['Daedalus', 'Wallet',
+           'TransactionRequest', 'TransactionRequest', 'TransactionResponse','TransactionDestination', 'TransactionSource',
+           'AddressResponse', 'AddressRequest',
+           'Faucet', 'Secrets', 'SSHTunnel',
            'get_logger', 'timestamp']
 
 import atexit

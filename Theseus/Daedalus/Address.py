@@ -1,11 +1,11 @@
-import Theseus
+from Theseus.Daedalus import Wallet
 import json
 import typing
 
 
 class AddressRequest:
     """ Address Request - a request to create a new address for a wallet  """
-    def __init__(self, wallet: Theseus.Wallet, password: str):
+    def __init__(self, wallet: Wallet, password: str):
         self.accountIndex = wallet.account
         self.walletId = wallet.id
         self.spendingPassword = password

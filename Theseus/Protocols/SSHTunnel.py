@@ -2,10 +2,8 @@ import os
 import select
 import Theseus
 import threading
-
-import socketserver as SocketServer
-
 import paramiko
+import socketserver as SocketServer
 
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'

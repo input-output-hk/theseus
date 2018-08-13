@@ -10,4 +10,4 @@ from .Address import AddressResponse, AddressRequest
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Daedalus Testing functions'
 __all__ = ['Wallet', 'API', 'get_logger', 'TransactionRequest', 'TransactionResponse', 'TransactionDestination',
-           'TransactionSource', 'AddressRequest', 'AddressResponse', 'Secrets']
+           'TransactionSource', 'AddressRequest', 'AddressResponse']

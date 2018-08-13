@@ -22,5 +22,5 @@ class Secrets:
         if key in self._storage:
             return self._storage[key]
         else:
-            self.logger.fatal('Key:"{0}" not found'.format(key))
+            self.logger.error('Key:"{0}" not found'.format(key))
             return ''

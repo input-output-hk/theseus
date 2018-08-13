@@ -1,27 +1,41 @@
 import Theseus
 import unittest2
 import json
-
+from pathlib import Path
+import shutil
 
 # This test requires the following data to live in ~/.theseus.secrets
 #
-# {
-#  "strings": "Value",
-#  "morestrings": "Value2",
-#  "1": "2",
-#  "numbers1": 1,
-#  "numbers2": 3283923823928371398721389,
-#  "numbers3": -50,
-#  "subtree": {
-#    "subkey": "subvalue"
-#  }
-# }
+
 #
 
 class TheseusSecrets(unittest2.TestCase):
     @classmethod
     def setupClass(cls):
+        cls.secrets_file = "{0}/{1}".format(Path.home(), '.theseus.secrets')
+        cls.backup_file = "{0}/{1}".format(Path.home(), '.theseus.secrets.backup')
+
+        shutil.move(cls.secrets_file, cls.backup_file)
+
+        testdata = """
+{
+  "strings": "Value",
+  "morestrings": "Value2",
+  "1": "2",
+  "numbers1": 1,
+  "numbers2": 3283923823928371398721389,
+  "numbers3": -50,
+  "subtree": {
+    "subkey": "subvalue"
+  }
+ }
+"""
+        open(cls.secrets_file, 'w').write(testdata)
         cls.secrets = Theseus.Secrets()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.move(cls.backup_file, cls.secrets_file)
 
     def test_01_strings(self):
         self.assertEqual(self.secrets.get('strings'), 'Value', msg="Correct value returned for strings")

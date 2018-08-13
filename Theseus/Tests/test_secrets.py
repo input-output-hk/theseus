@@ -26,12 +26,15 @@ class TheseusSecrets(unittest2.TestCase):
   }
  }
 """
-        open(cls.secrets_file, 'w').write(testdata)
-        cls.secrets = Theseus.Secrets()
+        with open(cls.secrets_file, 'w') as file:
+            file.write(testdata)
 
     @classmethod
     def tearDownClass(cls):
         shutil.move(cls.backup_file, cls.secrets_file)
+
+    def setUp(self):
+        self.secrets = Theseus.Secrets()
 
     def test_01_strings(self):
         self.assertEqual(self.secrets.get('strings'), 'Value', msg="Correct value returned for strings")

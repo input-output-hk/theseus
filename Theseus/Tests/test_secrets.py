@@ -4,10 +4,6 @@ import json
 from pathlib import Path
 import shutil
 
-# This test requires the following data to live in ~/.theseus.secrets
-#
-
-#
 
 class TheseusSecrets(unittest2.TestCase):
     @classmethod

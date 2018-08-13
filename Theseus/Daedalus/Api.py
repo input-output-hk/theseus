@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Any , Iterable
+from typing import Dict, List, Any, Iterable
 import requests
 
 import Theseus
@@ -116,12 +116,12 @@ class API:
             The created wallet object will also be appended to the local wallet cache.
         """
         # make payload structure for request
-        payload: Dict[str, str] = {
-            'operation': operation,
-            'backupPhrase': phrase.split(),
-            'assuranceLevel': assurance,
-            'name': name
-        }
+        payload: Dict[str, str] = dict(
+            operation=operation,
+            backupPhrase=phrase.split(),
+            assuranceLevel=assurance,
+            name=name
+        )
 
         if password:
             payload['spendingPassword'] = password
@@ -192,13 +192,13 @@ class API:
             Specification syntax can be found at https://cardanodocs.com/technical/wallet/api/v1/
 
         """
-        parameters: Dict[str, str] = {
-            'page': page,
-            'per_page': per_page,
-            'id': id_filter,
-            'balance': balance_filter,
-            'sort_by': sort_by
-        }
+        parameters: Dict[str, str] = dict(
+            page=page,
+            per_page=per_page,
+            id=id_filter,
+            balance=balance_filter,
+            sort_by=sort_by
+        )
 
         url = "https://{0}:{1}/api/v{2}/wallets".format(self._host, self._port, self._version)
 

@@ -8,10 +8,10 @@ import shutil
 class TheseusSecrets(unittest2.TestCase):
     @classmethod
     def setupClass(cls):
-        cls.secrets_file = "{0}/{1}".format(Path.home(), '.theseus.secrets')
-        cls.backup_file = "{0}/{1}".format(Path.home(), '.theseus.secrets.backup')
+        cls._secrets_file = "{0}/{1}".format(Path.home(), '.theseus.secrets')
+        cls._backup_file = "{0}/{1}".format(Path.home(), '.theseus.secrets.backup')
 
-        shutil.move(cls.secrets_file, cls.backup_file)
+        shutil.move(cls._secrets_file, cls._backup_file)
 
         testdata = """
 {
@@ -26,12 +26,12 @@ class TheseusSecrets(unittest2.TestCase):
   }
  }
 """
-        with open(cls.secrets_file, 'w') as file:
+        with open(cls._secrets_file, 'w') as file:
             file.write(testdata)
 
     @classmethod
     def tearDownClass(cls):
-        shutil.move(cls.backup_file, cls.secrets_file)
+        shutil.move(cls._backup_file, cls._secrets_file)
 
     def setUp(self):
         self.secrets = Theseus.Secrets()

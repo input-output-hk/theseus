@@ -116,7 +116,8 @@ class API:
             The created wallet object will also be appended to the local wallet cache.
         """
         # make payload structure for request
-        payload: Dict[str, str] = dict(
+        payload = Dict[str, str]
+        payload = dict(
             operation=operation,
             backupPhrase=phrase.split(),
             assuranceLevel=assurance,
@@ -192,7 +193,8 @@ class API:
             Specification syntax can be found at https://cardanodocs.com/technical/wallet/api/v1/
 
         """
-        parameters: Dict[str, str] = dict(
+        parameters = Dict[str, str]
+        parameters = dict(
             page=page,
             per_page=per_page,
             id=id_filter,

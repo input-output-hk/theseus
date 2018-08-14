@@ -1,6 +1,6 @@
 import requests
 import Theseus
-from typing import Dict
+import json
 
 # this hasn't been run yet , the captcha is getting in the way
 # it may need to be replaced by a specific wallet containing funds for tests
@@ -17,21 +17,24 @@ class Faucet:
         else:
             self.logger.error('Only testnet has a faucet at the moment')
 
-    def withdraw(self, adddress):
+    def withdraw(self, address):
         """ Withdraw - request a transfer of funds from the faucet to your wallet
 
         Args:
-            adddress(str): the wallet address to transfer to
+            address(str): the wallet address to transfer to
 
         Returns:
             FaucetResponse: the response data from the faucet
 
         """
         captcha = 'string'
-        payload: Dict[str, str] = {
-            'addresss': adddress,
-            'g-recaptcha-response': captcha
-        }
+        payload = json.dumps(
+            {
+                "address": address,
+                "g-recaptcha-response": captcha,
+            }
+        )
+
         response = requests.post(self._faucet_base_url + '/withdraw', data=payload)
 
         if response.status_code == 200:

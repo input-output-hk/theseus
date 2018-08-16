@@ -113,8 +113,8 @@ if '.py' in launching_filename:
     if launching_filename not in special_cases:
         log_file = sys.argv[0] + '.' + log_file
 
-print("Logging to: {0}".format(log_file))
 log_to_file(log_file, 'DEBUG')
 log_to_console('INFO')
 
-logger.info('Starting up Theseus')
+logger.info("Logging to: {0}".format(log_file))
+logger.info('Starting up Theseus V{0}({1})'.format(version(), build()))

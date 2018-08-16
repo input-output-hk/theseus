@@ -97,13 +97,14 @@ class SSHTunnel:
         # this runs in a try catch encase
         try:
             self.client.close()
-            self.thread.join(1)
+            self.thread._stop()
         except Exception as e:
             self.logger.error('Something bad happened during shutdown of the ssh tunnel: {0}'.format(e))
 
     def __aexit__(self, exc_type, exc_val, exc_tb):
         self.stop_tunnel()
-
+        self.client.close()
+        self.thread._stop()
 
     @property
     def user(self):

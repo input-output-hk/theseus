@@ -1,4 +1,6 @@
 from setuptools import setup
+from Theseus.version import __version__, __build__
+
 # Work around mbcs bug in distutils.
 # http://bugs.python.org/issue10945
 import codecs
@@ -12,7 +14,8 @@ except LookupError:
 
 setup(
     name='theseus',
-    version='1.1',
+    version=__version__,
+    build=__build__,
     packages=['Theseus', 'Theseus.Daedalus', 'Theseus.Protocols'],
     url='',
     license='',

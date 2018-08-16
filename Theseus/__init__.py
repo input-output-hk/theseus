@@ -70,7 +70,7 @@ def _signal_handler(signal: int, frame: any):
 
     Args:
         signal(int): signal number
-        frane(Frame): the frame that was running when we where called
+        frame(Frame): the frame that was running when we where called
 
     """
     try:

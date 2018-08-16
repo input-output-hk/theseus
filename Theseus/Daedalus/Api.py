@@ -116,7 +116,7 @@ class API:
             The created wallet object will also be appended to the local wallet cache.
         """
         # make payload structure for request
-        payload = Dict[str, str]
+        payload: Dict[str, str]
         payload = dict(
             operation=operation,
             backupPhrase=phrase.split(),

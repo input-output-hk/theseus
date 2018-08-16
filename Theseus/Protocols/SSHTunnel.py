@@ -1,10 +1,11 @@
 import os
 import select
-import Theseus
+#import Theseus
 import threading
 import paramiko
 import socketserver as SocketServer
-
+import logging
+import atexit
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'SSH Tunnel'
@@ -36,8 +37,12 @@ class SSHTunnel:
     When you load this class the tunnel will be started and will run in a Thread.
     The Thread will run until either the connection drops or this the object goes out of scope.
 
+    You will need to call the stop_tunnel method to shutdown your tunnel otherwise your test wont exit
+    Hopefully this will be fixed soon and that wiil become a noop
+
     """
-    def __init__(self,  user: str, host: str, port: int, localport: int, remoteport: int,  localhost: str = '127.0.0.1', remotehost: str = '127.0.0.1'):
+    def __init__(self,  user: str, host: str, port: int=22, localport: int=8090,
+                 remoteport: int=8090,  localhost: str='127.0.0.1', remotehost: str='127.0.0.1'):
 
         # params for initial ssh to endpoint
         self._user = user
@@ -50,7 +55,7 @@ class SSHTunnel:
         self._remotehost = remotehost
         self._localhost = localhost
 
-        self.logger = Theseus.get_logger('ssh-tunnel')
+        self.logger = logging.getLogger('theseus.ssh-tunnel')
 
         self.client = paramiko.SSHClient()
 
@@ -96,15 +101,14 @@ class SSHTunnel:
         """ Stop SSHTunnel - stop the ssh connection and tunnel """
         # this runs in a try catch encase
         try:
+            self.server.shutdown()
             self.client.close()
-            self.thread = False
+            self.thread.join(1)
         except Exception as e:
             self.logger.error('Something bad happened during shutdown of the ssh tunnel: {0}'.format(e))
 
-    def __aexit__(self, exc_type, exc_val, exc_tb):
+    def __del__(self):
         self.stop_tunnel()
-        self.client.close()
-        self.thread = False
 
     @property
     def user(self):
@@ -163,12 +167,16 @@ class SSHTunnel:
         remote_port = self.remoteport
 
         class SubHander(Handler):
-            self.logger = Theseus.get_logger('ssh-sub-handler')
+            self.logger = logging.getLogger('theseus.ssh-sub-handler')
             chain_host = remote_host
             chain_port = remote_port
             ssh_transport = transport
 
-        self.thread = threading.Thread(target=ForwardServer(("", self.localport), SubHander).serve_forever)
+            def shutdown(self):
+                self.shutdown()
+
+        self.server = ForwardServer(("", self.localport), SubHander)
+        self.thread = threading.Thread(target=self.server.serve_forever)
         self.thread.start()
 
 
@@ -177,10 +185,12 @@ class ForwardServer(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
 
 
+
+
 class Handler(SocketServer.BaseRequestHandler):
     def __init__(self, *args, **kwargs):
         # add a logger then run the super class passing on all args
-        self.logger = Theseus.get_logger('ssh_handler')
+        self.logger = logging.getLogger('theseus.ssh_handler')
         super().__init__(*args, **kwargs)
 
     def handle(self):

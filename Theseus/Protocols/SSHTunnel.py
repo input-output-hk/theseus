@@ -65,7 +65,6 @@ class SSHTunnel:
         self.client.load_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
 
         self.thread = threading.Thread()
-        self.server = ''
 
         self.start_tunnel()
 

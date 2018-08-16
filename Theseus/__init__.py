@@ -20,6 +20,7 @@ import os
 import signal
 import sys
 import time
+from .version import __version__, __build__
 
 
 def finish(reason=None):
@@ -87,6 +88,17 @@ def _signal_handler(signal: int, frame: any):
 
 signal.signal(signal.SIGINT, _signal_handler)
 atexit.register(finish)
+
+
+def version():
+    """ Returns the Theseus version """
+    return __version__
+
+
+def build():
+    """ Returns the Theseus build number """
+    return __build__
+
 
 # start the logging
 logger = logging.getLogger('theseus')

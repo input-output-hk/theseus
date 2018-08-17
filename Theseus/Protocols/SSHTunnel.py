@@ -183,9 +183,6 @@ class ForwardServer(SocketServer.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-
-
-
 class Handler(SocketServer.BaseRequestHandler):
     def __init__(self, *args, **kwargs):
         # add a logger then run the super class passing on all args

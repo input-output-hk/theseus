@@ -51,6 +51,7 @@ class TheseusSecrets(unittest2.TestCase):
         self.assertEqual(self.secrets.get('subtree')["subkey"], "subvalue", msg="direct reference to key")
 
 
+
 # start unittest2 to run these tests
 if __name__ == "__main__":
     unittest2.main()

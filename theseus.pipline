@@ -1,0 +1,73 @@
+node {
+        stage("Checking out source code") {
+            checkout(
+                [
+                    $class: 'GitSCM', branches: [[name: '*/master']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs:
+                    [
+                        [
+                            credentialsId: 'IOHK-QA',
+                            url: 'https://github.com/input-output-hk/theseus'
+                        ]
+                    ]
+                ]
+            )
+        }
+        stage("Assign Version Number") {
+            sh '''
+# patch in the build number
+perl -pi -e "s/Source/$BUILD_NUMBER/" Theseus/version.py
+'''
+        }
+
+        stage("Install dependencies") {
+            sh '''
+# ensure we have all the specified dependencies upto date
+pip3.7 install -e . --user --upgrade
+'''
+        }
+        stage("Run unit tests") {
+            sh '''
+# run the tests with xunit output
+python3.7 /usr/bin/nosetests3 --with-xunit --xunit-file nosetests.xml --xunit-testsuite-name=Theseus -d --verbosity 2 -w Theseus/Tests/
+
+'''
+        }
+        stage("Build Egg file") {
+            sh '''
+echo "Building egg file"
+python3.7 setup.py bdist_egg
+
+echo "copying egg file"
+cp dist/theseus*.egg theseus.egg
+'''
+        }
+        stage ("Build documentation") {
+            sh '''
+cd sphinx
+make html
+'''
+        }
+        stage("Publish documentation") {
+            publishHTML(
+                [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'sphinx/build/html',
+                    reportFiles: 'index.html',
+                    reportName: 'Documentation',
+                    reportTitles: ''
+                ]
+            )
+        }
+        stage ("Archive artifacts") {
+            archiveArtifacts artifacts: 'theseus.egg , nosetests.xml'
+        }
+        stage("Publish test results") {
+            junit testDataPublishers: [[ $class: 'StabilityTestDataPublisher']], testResults: '**/nosetests.xml'
+        }
+    }

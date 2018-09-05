@@ -76,6 +76,11 @@ class API:
         self.logger.info('Connecting to Daedalus')
         self.fetch_wallet_list()
 
+    def __del__(self):
+        if self._ssh_tunnel:
+            self.logger.info('shutting down tunnel from api object')
+            self.tunnel.stop_tunnel()
+            
     @property
     def wallets(self) -> Iterable[Wallet]:
         return self._wallets

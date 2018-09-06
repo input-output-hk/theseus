@@ -102,7 +102,6 @@ class SSHTunnel:
         try:
             self.server.shutdown()
             self.client.close()
-            self.thread.join(1)
         except Exception as e:
             self.logger.error('Something bad happened during shutdown of the ssh tunnel: {0}'.format(e))
 
@@ -172,7 +171,7 @@ class SSHTunnel:
             ssh_transport = transport
 
             def shutdown(self):
-                self.shutdown()
+                del self
 
         self.server = ForwardServer(("", self.localport), SubHander)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=False)
@@ -184,7 +183,7 @@ class ForwardServer(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
 
     def shutdown(self):
-        self.__exit__()
+        del self
 
 
 class Handler(SocketServer.BaseRequestHandler):

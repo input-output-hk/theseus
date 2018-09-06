@@ -175,13 +175,17 @@ class SSHTunnel:
                 self.shutdown()
 
         self.server = ForwardServer(("", self.localport), SubHander)
-        self.thread = threading.Thread(target=self.server.serve_forever)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=False)
         self.thread.start()
 
 
 class ForwardServer(SocketServer.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
+
+    def shutdown(self):
+        self.__exit__()
+
 
 class Handler(SocketServer.BaseRequestHandler):
     def __init__(self, *args, **kwargs):

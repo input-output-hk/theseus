@@ -174,7 +174,7 @@ class SSHTunnel:
                 del self
 
         self.server = ForwardServer(("", self.localport), SubHander)
-        self.thread = threading.Thread(target=self.server.serve_forever, daemon=False)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
 
 

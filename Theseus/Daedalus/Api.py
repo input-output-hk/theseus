@@ -79,7 +79,7 @@ class API:
     def __del__(self):
         if self._ssh_tunnel:
             self.logger.info('shutting down tunnel from api object')
-            del self.tunnel
+            self.tunnel = ''
             
     @property
     def wallets(self) -> Iterable[Wallet]:

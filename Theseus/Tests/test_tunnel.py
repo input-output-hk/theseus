@@ -9,6 +9,6 @@ class TheseusSSHTunnel(unittest2.TestCase):
         self.host = self.secrets.get('Daedalus')['host']
 
     def test_basic_tunnel(self):
-        self.sshtunnel = Theseus.Protocols.SSHTunnel(user=self.user, host=self.host, port=22, localport=8090, remoteport=8090)
-        self.assertIsInstance(self.sshtunnel, Theseus.Protocols.SSHTunnel, msg="SSh Tunnel was connected")
+        self.sshtunnel = Theseus.Protocols.SSHTunnel(user=self.user, host=self.host, port=22, localport=8090, remoteport=8091)
+        self.assertIsInstance(self.sshtunnel, Theseus.Protocols.SSHTunnel, msg="SSH Tunnel was connected")
         self.sshtunnel.stop_tunnel()

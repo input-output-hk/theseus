@@ -64,7 +64,7 @@ class API:
 
         # configure an SSH tunnel if we need one
         if ssh_tunnel is True:
-            self.tunnel = SSHTunnel(username, host, ssh_port, remote_port, local_port)
+            self.tunnel = SSHTunnel(username, host, ssh_port, local_port, remote_port)
             # if we are tunnelling then set the host and port must be local
             self._host = '127.0.0.1'
             # if we are tunneling the set the port to match the local_port of the ssh tunnel

@@ -65,7 +65,7 @@ class SSHTunnel:
         self.client.load_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
 
         self.thread = threading.Thread()
-        self.server = ForwardServer
+        self.server: ForwardServer
         self.start_tunnel()
 
     def start_tunnel(self):
@@ -100,7 +100,8 @@ class SSHTunnel:
         """ Stop SSHTunnel - stop the ssh connection and tunnel """
         # this runs in a try catch encase
         try:
-            self.server = ''
+            self.server.__shutdown_request = True
+            self.server.server_close()
             self.client.close()
         except Exception as e:
             self.logger.error('Something bad happened during shutdown of the ssh tunnel: {0}'.format(e))
@@ -178,6 +179,10 @@ class SSHTunnel:
 class ForwardServer(SocketServer.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
+
+    def server_close(self):
+        """we don't seem to need to do anything here."""
+        pass
 
 
 class Handler(SocketServer.BaseRequestHandler):

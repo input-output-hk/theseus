@@ -75,11 +75,6 @@ class API:
 
         self.logger.info('Connecting to Daedalus')
         self.fetch_wallet_list()
-
-    def __del__(self):
-        if self._ssh_tunnel:
-            self.logger.info('shutting down tunnel from api object')
-            self.tunnel = ''
             
     @property
     def wallets(self) -> Iterable[Wallet]:
@@ -180,7 +175,7 @@ class API:
         except Exception:
             return False
 
-    def fetch_wallet_list(self, id_filter: str='', balance_filter: str='', sort_by: str='', page: int=1, per_page: int=10)-> List[Wallet]:
+    def fetch_wallet_list(self, id_filter: str="", balance_filter: str="", sort_by: str="", page: int=1, per_page: int=10)-> List[Wallet]:
         """ Fetch a list of wallets: Queries the daedalus wallet and updates the local wallet cache
 
         Args:
@@ -198,27 +193,29 @@ class API:
             Specification syntax can be found at https://cardanodocs.com/technical/wallet/api/v1/
 
         """
-        parameters = Dict[str, str]
-        parameters = dict(
-            page=page,
-            per_page=per_page,
-            id=id_filter,
-            balance=balance_filter,
-            sort_by=sort_by
-        )
+        url = "https://{0}:{1}/api/v{2}/wallets?page={3};per_page={4}".format(
+            self._host, self._port, self._version, page, per_page)
 
-        url = "https://{0}:{1}/api/v{2}/wallets".format(self._host, self._port, self._version)
+        if id_filter:
+            url += ";id={0}".format(id_filter)
 
-        response = requests.Response
+        if balance_filter:
+            url += ";balance={0}".format(balance_filter)
 
-        self.logger.debug("Fetching Wallet Listing: Url: '{0}' JSON: '{1}'".format(url, parameters))
+        if sort_by:
+            sort_by += ";sort_buy".format(sort_by)
+
+        response: requests.Response
+
+        self.logger.debug("Fetching Wallet Listing: Url: '{0}'".format(url))
         try:
-            response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers, params=parameters)
-        except ConnectionRefusedError:
-            self.logger.error('Connection Refused: check the details and the ssh tunnel make sense')
+            response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers)
+        except ConnectionRefusedError as e:
+            self.logger.error('Connection Refused: {0} check the details and the ssh tunnel make sense'.format(e))
 
         if response.status_code == 200:
             wallet_data = response.json()
+            self.logger.info(wallet_data['data'])
             wallets = wallet_data['data']
             self.logger.info('Fetched data on {0} wallets'.format(len(wallets)))
 

@@ -205,7 +205,7 @@ class API:
         if sort_by:
             sort_by += ";sort_buy".format(sort_by)
 
-        response = requests.Response
+        response: requests.Response
 
         self.logger.debug("Fetching Wallet Listing: Url: '{0}'".format(url))
         try:

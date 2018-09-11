@@ -22,7 +22,7 @@ setup(
     author='amias.channer@iohk.io',
     author_email='amias.channer@iohk.io',
     description='a system for orchestrating test scenarios with Daedalus and other IOHK projects',
-    install_requires=['mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2','sphinx_autodoc-typehints','sphinx-autodoc-napoleon-typehints'],
+    install_requires=['mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2','sphinx_autodoc-typehints','sphinx-autodoc-napoleon-typehints','sphinx-autodoc-annotation'],
     zip_safe=True
 )
 

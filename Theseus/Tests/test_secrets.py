@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 
 
-class TheseusSecrets(unittest2.TestCase):
+class TestTheseusSecrets(unittest2.TestCase):
     @classmethod
     def setupClass(cls):
         cls._secrets_file = "{0}/{1}".format(Path.home(), '.theseus.secrets')

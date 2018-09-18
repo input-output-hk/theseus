@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    Protocols.SSH.SSHTunnel
+    Protocols.SSHTunnel
 
 Module contents
 ---------------

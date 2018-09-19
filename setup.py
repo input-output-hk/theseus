@@ -21,8 +21,8 @@ setup(
     license='',
     author='amias.channer@iohk.io',
     author_email='amias.channer@iohk.io',
-    description='a system for orchestrating test scenarios with Daedalus and other IOHK projects',
-    install_requires=['mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2', 'sphinx-autodoc-annotation'],
+    description='a system for orchestrating test scenarios for IOHK projects',
+    install_requires=['typing', 'mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2', 'sphinx-autodoc-annotation'],
     zip_safe=True
 )
 

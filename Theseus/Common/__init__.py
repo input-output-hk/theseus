@@ -1,6 +1,6 @@
 from .Generators import generate_mnemonic, check_mnemonic, generate_walletname
 from .Wallet import Wallet
-from .WalletApi import WalletAPI
+from .WalletAPI import WalletAPI
 from .Account import Account
 from .Address import AddressRequest, AddressResponse
 from .Transaction import TransactionResponse, TransactionRequest, TransactionDestination, TransactionSource

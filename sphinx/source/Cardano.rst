@@ -1,12 +1,17 @@
-Daedalus package
+Cardano package
 ================
 
+Subpackages
+-----------
+
 .. toctree::
+
+    Cardano.Faucet
 
 Module contents
 ---------------
 
-.. automodule:: Theseus.Daedalus
+.. automodule:: Theseus.Cardano
     :members:
     :undoc-members:
     :show-inheritance:

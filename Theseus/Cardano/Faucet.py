@@ -7,6 +7,17 @@ import json
 
 
 class Faucet:
+    """" Cardano Faucet - Get free TestNet ada
+
+    This object provides a mechanism to acquire free TestNet Ada for the purposes of testing.
+
+    A withdrawl request will send a random amount of ada to your recieve address.
+
+    If you have ada left over after testing you can return it to the faucet by making a transaction to a faucet receive address which can be obtained wiht get_return_address
+
+    This code is currently prevented from working by the existence of a recapcha check and so will fail.
+     
+    """
     def __init_(self, network: str='TestNet'):
 
         self._faucet_base_url = str

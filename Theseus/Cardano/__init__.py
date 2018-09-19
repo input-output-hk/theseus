@@ -1,6 +1,6 @@
 import logging
 from .Faucet import Faucet
-from Theseus.Common.WalletApi import WalletAPI
+from Theseus.Common.WalletAPI import WalletAPI
 from Theseus.Common.Wallet import Wallet
 from Theseus.Common.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
 from Theseus.Common.Address import AddressResponse, AddressRequest

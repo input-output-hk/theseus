@@ -8,7 +8,7 @@ from .version import __version__, __build__
 from .Common.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
 from .Common.Address import AddressRequest, AddressResponse
 from .Common.Wallet import Wallet
-from .Common.WalletApi import WalletAPI
+from .Common.WalletAPI import WalletAPI
 from .Common.Generators import generate_mnemonic, check_mnemonic, generate_walletname
 
 # composed objects representing key parts of cardano
@@ -22,7 +22,7 @@ __all__ = ['Cardano', 'Daedalus',
            'TransactionRequest', 'TransactionResponse', 'TransactionDestination', 'TransactionSource',
            'AddressResponse', 'AddressRequest',
            'generate_mnemonic', 'check_mnemonic', 'generate_walletname',
-           'Faucet', 'Secrets', 'SSHTunnel',
+           'Secrets', 'SSHTunnel',
            'get_logger', 'timestamp']
 
 # dependencies for the rest of this file

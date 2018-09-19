@@ -1,7 +1,7 @@
-Daedalus Wallet module
+Common.Account Module
 ======================
 
-.. automodule:: Theseus.Daedalus.Wallet
+.. automodule:: Common.Account
     :members:
     :undoc-members:
     :show-inheritance:

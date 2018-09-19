@@ -2,13 +2,11 @@ import json
 from typing import Dict, List, Iterable
 import requests
 
-#import Theseus
+#  import only the specific parts of theseus we need
 from Theseus.Common.Wallet import Wallet
 from Theseus.Common.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
 from Theseus.Common.Address import AddressResponse, AddressRequest
-
-#from Theseus import Wallet, TransactionRequest, TransactionResponse, SSHTunnel, AddressResponse, AddressRequest
 
 # hack to stop urlib3 complaining when we turn off SSL warnings
 import urllib3
@@ -16,7 +14,7 @@ urllib3.disable_warnings()
 
 
 class WalletAPI:
-    """" API - Provides access to the Wallet API
+    """" WalletAPI - Provides access to the Wallet API
 
     This object will provide access to an instance of the Cardano Wallet API which can be provided by either a daedalus
     installation or a cardano node that is running a wallet backend.

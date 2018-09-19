@@ -1,11 +1,9 @@
 import os
 import select
-#import Theseus
 import threading
 import paramiko
 import socketserver as SocketServer
 import logging
-import atexit
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'SSH Tunnel'

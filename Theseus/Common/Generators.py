@@ -52,7 +52,7 @@ def generate_walletname(evil=0, length=8):
         Python string constants are used to create the charecter lists
         https://docs.python.org/3.4/library/string.html
     """
-    string_options: str
+    string_options = str
     # configurable levels of evil content for wallet names
     if evil == 0:
         string_options = string.ascii_uppercase + string.digits

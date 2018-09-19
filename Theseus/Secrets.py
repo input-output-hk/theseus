@@ -11,7 +11,8 @@ class Secrets:
 
     This is important because these tests need to be stored in a public repository so any credentials in them may be abused.
 
-    Currently the secrets data is stored in  ~/.theseus.secrets but this abstracted enough that we could use other sources if we need to without changing how tests use this interface.
+    Currently the secrets data is stored in  ~/.theseus.secrets but this abstracted enough that we could use other
+     sources if we need to without changing how tests use this interface.
 
     Usage:
 
@@ -19,7 +20,7 @@ class Secrets:
 
         {
           "Daedalus": {
-            "username": "ssh_user",
+            "user": "ssh_user",
             "host": "IP.AD.DR.ES",
             "port": 8090,
             }
@@ -28,10 +29,16 @@ class Secrets:
     You can be access the secrets with code as follows::
 
         from Theseus import Secrets
-
         self.secrets = Theseus.Secrets()
+
+        you can just give the block directly to the constructor as kwargs , as long as the keys match::
+
+        daedalus = Daedalus(**self.secrets.get('Daedalus'))
+
+        or unpack it a bit more if you want to change the values::
+
         host = self.secrets.get('Daedalus')['host']
-        user = self.secrets.get('Daedalus')['username']
+        user = self.secrets.get('Daedalus')['user']
         port = self.secrets.get('Daedalus')['port']
 
         daedalus = Daedalus(host=host, user=user, port=port)
@@ -48,6 +55,7 @@ class Secrets:
 
     def load_secrets(self):
         """ Overwrites current secrets storage with new data """
+        json_data = 'error'
         try:
             json_data = open(self._backing).read()
         except Exception as e:
@@ -61,14 +69,9 @@ class Secrets:
         Use this to fetch an block from the config file optionally filtering it to a specific key.
         This operation is a fetch from memory so call it as much as you like.
 
-        Usage::
-
-        block = self.secrets.get('Block)
-        host = block['host']
-
-        or::
-
-        host = self.secrets.get('Block')['host']
+        Args:
+               key(str): The name of the key or block to fetch
+        Return:
 
         """
         if key in self._storage:

@@ -7,6 +7,7 @@ from Theseus.Common.Wallet import Wallet
 from Theseus.Common.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
 from Theseus.Common.Address import AddressResponse, AddressRequest
+from Theseus import get_logger
 
 # hack to stop urlib3 complaining when we turn off SSL warnings
 import urllib3
@@ -59,7 +60,7 @@ class WalletAPI:
 
         self._version = version
 
-        self.logger = self.get_logger(self.__class__.__name__)
+        self.logger = self.get_logger("{0}:{1}".format(self._host, self._port))
 
         self.json_headers = {
             'Accept': 'application/json;charset=utf-8',
@@ -77,15 +78,16 @@ class WalletAPI:
         # this is the wallet cache , a Dict of Wallets
         self._wallets = List[Wallet]
 
-        self.logger.info('Connecting to Daedalus')
+        self.logger.info('Connecting to WalletAPI')
         self.fetch_wallet_list()
 
     @property
     def wallets(self) -> Iterable[Wallet]:
         return self._wallets
 
-    def get_logger(self):
-        Theseus.get_logger
+    def get_logger(self, name):
+        get_logger(name)
+
     def restore_wallet(self, name: str, phrase: str, password: str, assurance: str="strict") -> Wallet:
         """ Restore a Wallet: Restores a wallet via the daedalus api using the supplied credentials
 
@@ -108,7 +110,7 @@ class WalletAPI:
 
     def create_wallet(self, name: str, phrase: str, password: str='', 
                       assurance: str="strict", operation: str='create') -> Wallet:
-        """ Create a Wallet: Creates a wallet via the daedalus api using the supplied credentials
+        """ Create a Wallet: Creates a wallet via the wallet api using the supplied credentials
 
         Args:
             name (str): Wallet name
@@ -147,7 +149,7 @@ class WalletAPI:
                 response_payload = response_data['data']
                 if operation == 'restore':
                     self.logger.info('Restore status: {0}'.format(response_data['data']['syncState']))
-                wallet = Theseus.Daedalus.Wallet(id=response_payload['id'], name=name, passphrase=phrase,
+                wallet = Wallet(id=response_payload['id'], name=name, passphrase=phrase,
                                                  assurance=assurance, balance=response_payload['balance'])
                 self.wallets.append(wallet)
                 return wallet
@@ -156,7 +158,7 @@ class WalletAPI:
         """ Delete a wallet: Deletes a wallet from daedalus
 
         Args:
-            wallet (Daedalus.Wallet): Wallet to delete
+            wallet (Wallet): Wallet to delete
 
         Returns:
             boolean : True if wallet was deleted.
@@ -256,7 +258,7 @@ class WalletAPI:
             else:
                 self._wallets = []
                 for wallet in wallets:
-                    fresh = Theseus.Daedalus.Wallet(id=wallet['id'], name=wallet['name'], balance=wallet['balance'])
+                    fresh = Wallet(id=wallet['id'], name=wallet['name'], balance=wallet['balance'])
                     self._wallets.append(fresh)
         else:
             self.logger.info('Wallet listed fetch failed: {0}'.format(response.status_code))

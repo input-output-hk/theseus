@@ -1,15 +1,7 @@
 Daedalus package
 ================
 
-Subpackages
------------
-
 .. toctree::
-
-    Daedalus.Api
-    Daedalus.Generators
-    Daedalus.Wallet
-    Daedalus.Logging
 
 Module contents
 ---------------

@@ -1,23 +1,27 @@
 import json
-from typing import Dict, List, Any, Iterable
+from typing import Dict, List, Iterable
 import requests
 
-import Theseus
-from Theseus.Daedalus.Wallet import Wallet
-from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse
+#  import only the specific parts of theseus we need
+from Theseus.Common.Wallet import Wallet
+from Theseus.Common.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
-from Theseus.Daedalus.Address import AddressResponse, AddressRequest
+from Theseus.Common.Address import AddressResponse, AddressRequest
 
 # hack to stop urlib3 complaining when we turn off SSL warnings
 import urllib3
 urllib3.disable_warnings()
 
 
-class API:
-    """" API - Provides access to the Daedalus Wallet API
+class WalletAPI:
+    """" WalletAPI - Provides access to the Wallet API
 
-    This object will provide access to an instance of the Daedalus Wallet API , this is typically configured to
-    be available on the loopback interface (127.0.0.1) for security purposes.
+    This object will provide access to an instance of the Cardano Wallet API which can be provided by either a daedalus
+    installation or a cardano node that is running a wallet backend.
+
+    This interface is typically configured to be available on the loopback interface (127.0.0.1) for security purposes.
+
+    Currently the use of SSH certificates is not enforced so ssl_verify is defaulted to False
 
     To access a remote instance you will need to use an SSH tunnel to forward the ports to make it accessible.
 
@@ -55,7 +59,7 @@ class API:
 
         self._version = version
 
-        self.logger = Theseus.Daedalus.get_logger('API')
+        self.logger = self.get_logger(self.__class__.__name__)
 
         self.json_headers = {
             'Accept': 'application/json;charset=utf-8',
@@ -75,11 +79,13 @@ class API:
 
         self.logger.info('Connecting to Daedalus')
         self.fetch_wallet_list()
-            
+
     @property
     def wallets(self) -> Iterable[Wallet]:
         return self._wallets
 
+    def get_logger(self):
+        Theseus.get_logger
     def restore_wallet(self, name: str, phrase: str, password: str, assurance: str="strict") -> Wallet:
         """ Restore a Wallet: Restores a wallet via the daedalus api using the supplied credentials
 
@@ -100,7 +106,8 @@ class API:
         """
         return self.create_wallet(name, phrase, password, assurance, operation='restore')
 
-    def create_wallet(self, name: str, phrase: str, password: str='', assurance: str="strict", operation: str='create') -> Wallet:
+    def create_wallet(self, name: str, phrase: str, password: str='', 
+                      assurance: str="strict", operation: str='create') -> Wallet:
         """ Create a Wallet: Creates a wallet via the daedalus api using the supplied credentials
 
         Args:
@@ -116,7 +123,6 @@ class API:
             The created wallet object will also be appended to the local wallet cache.
         """
         # make payload structure for request
-        payload = Dict[str, str]
         payload = dict(
             operation=operation,
             backupPhrase=phrase.split(),
@@ -164,6 +170,31 @@ class API:
             return True
         else:
             self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
+            return False
+
+    def import_wallet(self, wallet_number: int=0)-> bool:
+        """ Import Wallet: Import a poor wallet
+
+        This is only available on cardano nodes
+
+        Args:
+            wallet_number (int) : Poor Key number (0-11)
+
+        Returns:
+            boolean: True if wallet is was imported
+        """
+        url = " https://{0}:{1}/api/internal/import-wallet".format(self._host, self._port)
+        payload = dict(
+            filePath="state-demo/genesis-keys/generated-keys/poor/key{0}.sk".format(wallet_number)
+        )
+        self.logger.info("Importing Poor Wallet: {0}".format(wallet_number))
+        response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=json.dumps(payload))
+
+        if response.status_code == 200:
+            self.logger.info("Poor wallet was imported")
+            return True
+        else:
+            self.logger.error("Error importing poor wallet: {0}".format(response.content))
             return False
 
     def delete_all_wallets(self) -> bool:
@@ -257,7 +288,7 @@ class API:
             return TransactionResponse("status:'failed'")
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
-        """ Create Address: creates a new recieve address
+        """ Create Address: creates a new receive address
 
         Args:
             address_request(AddressRequest): the address request
@@ -273,3 +304,4 @@ class API:
             return AddressResponse(response.text)
         else:
             return AddressResponse('"status":"error"')
+        

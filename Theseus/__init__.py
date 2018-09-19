@@ -1,26 +1,37 @@
-from Theseus.Logging import log_to_console, log_to_file, get_logger, timestamp
-from Theseus.Daedalus import Wallet
-from Theseus.Daedalus.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
-from Theseus.Daedalus.Address import AddressRequest, AddressResponse
-from Theseus.Protocols.SSHTunnel import SSHTunnel
-from Theseus.Faucet import Faucet
-from Theseus.Secrets import Secrets
+# theseus internals
+from .Logging import log_to_console, log_to_file, get_logger, timestamp
+from .Secrets import Secrets
+from .Protocols.SSHTunnel import SSHTunnel
+from .version import __version__, __build__
+
+# common parts of the cardano system
+from .Common.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
+from .Common.Address import AddressRequest, AddressResponse
+from .Common.Wallet import Wallet
+from .Common.WalletAPI import WalletAPI
+from .Common.Generators import generate_mnemonic, check_mnemonic, generate_walletname
+
+# composed objects representing key parts of cardano
+from .Cardano import Cardano
+from .Daedalus import Daedalus
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Theseus Automated Test Framework'
-__all__ = ['Daedalus', 'Wallet',
-           'TransactionRequest', 'TransactionRequest', 'TransactionResponse','TransactionDestination', 'TransactionSource',
+__all__ = ['Cardano', 'Daedalus',
+           'Wallet', 'WalletAPI',
+           'TransactionRequest', 'TransactionResponse', 'TransactionDestination', 'TransactionSource',
            'AddressResponse', 'AddressRequest',
-           'Faucet', 'Secrets', 'SSHTunnel',
+           'generate_mnemonic', 'check_mnemonic', 'generate_walletname',
+           'Secrets', 'SSHTunnel',
            'get_logger', 'timestamp']
 
+# dependencies for the rest of this file
 import atexit
 import logging
 import os
 import signal
 import sys
 import time
-from .version import __version__, __build__
 
 
 def finish(reason=None):
@@ -106,7 +117,7 @@ logger.setLevel('DEBUG')
 
 # configure the general log , if we are called by a script then make script.daedalus.log
 log_file = 'theseus.log'
-special_cases = ['noserunner.py', 'utrunner.py', 'jb-unittest_runner.py']
+special_cases = ['noserunner.py', 'utrunner.py', '_jb_unittest_runner.py', '_jb_nosetest_runner.py']
 launching_filename = os.sep.join(sys.argv[0].split(os.sep)[-1:])
 
 if '.py' in launching_filename:

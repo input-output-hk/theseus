@@ -2,7 +2,7 @@ import Theseus
 import unittest2
 
 
-class TheseusSSHTunnel(unittest2.TestCase):
+class TestTheseusSSHTunnel(unittest2.TestCase):
     def setUp(self):
         self.secrets = Theseus.Secrets()
         self.user = self.secrets.get('Daedalus')['username']

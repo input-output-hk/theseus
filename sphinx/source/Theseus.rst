@@ -12,7 +12,7 @@ Heres an example showing wallet creation on a local instance.
     import Theseus
     import Daedalus
 
-    daedalus = daedalus.API()
+    daedalus = daedalus()
 
     for i in range(0, wallet_count):
         phrase = generate_menmonic('english')
@@ -24,7 +24,7 @@ Heres an example showing wallet creation on a local instance.
             print("Created Wallet: {0}").format(wallet.dump())
 
 
-By default the API object will connect to a local cardano-node on 127.0.0.1:8090.
+By default the daedalus object will connect to a local wallet API running on a cardano-node on 127.0.0.1:8090.
 
 if you want to control a remote instance of daedalus then just forward the ports with ssh first.
 
@@ -33,9 +33,12 @@ Subpackages
 -----------
 
 .. toctree::
+    Cardano
+    Common
     Daedalus
     Logging
     Protocols
+    Secrets
 
 Module contents
 ---------------

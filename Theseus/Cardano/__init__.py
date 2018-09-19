@@ -1,4 +1,5 @@
 import logging
+from .Faucet import Faucet
 from Theseus.Common.WalletAPI import WalletAPI
 from Theseus.Common.Wallet import Wallet
 from Theseus.Common.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
@@ -6,12 +7,12 @@ from Theseus.Common.Address import AddressResponse, AddressRequest
 
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
-__doc__ = 'Daedalus Testing functions'
-__all__ = ['Daedalus', 'Wallet', 'WalletAPI', 'get_logger', 'TransactionRequest', 'TransactionResponse', 'TransactionDestination',
+__doc__ = 'Cardano Testing functions'
+__all__ = ['Cardano','Wallet', 'WalletAPI', 'TransactionRequest', 'TransactionResponse', 'TransactionDestination',
            'TransactionSource', 'AddressRequest', 'AddressResponse']
 
 
-class Daedalus(WalletAPI):
+class Cardano(WalletAPI):
     def get_logger(self, key=None):
         """ Get a logging handle
 
@@ -26,8 +27,9 @@ class Daedalus(WalletAPI):
         if key:
             # enforce our logging prefix
             stub = key[0:7]
-            if stub != 'theseus.daedalus':
-                key = 'theseus.daedalus.' + key
+            if stub != 'theseus.cardano':
+                key = 'theseus.cardano.' + key
             return logging.getLogger(str(key))
         else:
-            return logging.getLogger('theseus.daedalus.unknown')
+            return logging.getLogger('theseus.cardano.unknown')
+

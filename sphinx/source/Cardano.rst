@@ -1,17 +1,17 @@
-Protocols package
-=================
+Cardano package
+================
 
 Subpackages
 -----------
 
 .. toctree::
 
-    Protocols.SSHTunnel
+    Cardano.Faucet
 
 Module contents
 ---------------
 
-.. automodule:: Theseus.Protocols
+.. automodule:: Theseus.Cardano
     :members:
     :undoc-members:
     :show-inheritance:

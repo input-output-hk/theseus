@@ -1,7 +1,7 @@
 class Account:
-    """ An object representing a Daedalus Account
+    """ An object representing a Wallet backend Account
 
-    An account may have multiple wallets and instance of daedalus can currently have one account
+    An account may have multiple wallets and instance of wallet backend can have multiple accounts
 
     Args:
         wallet_id (int): A wallet ID
@@ -28,5 +28,5 @@ class Account:
         self._account_id = value
 
     def dump(self):
-        template = "Daedalus Account\n\tWallet_ID:{0}\n\tAccount_ID:{1}"
+        template = "Account\n\tWallet_ID:{0}\n\tAccount_ID:{1}"
         return template.format(self.account_id, self.wallet_id)

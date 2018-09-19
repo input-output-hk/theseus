@@ -1,6 +1,10 @@
-from Theseus.Daedalus import Wallet
+from Theseus.Common import Wallet
 import json
 import typing
+
+__author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
+__doc__ = 'Common - Address objects'
+__any__ = ['AddressRequest', 'AddressResponse']
 
 
 class AddressRequest:

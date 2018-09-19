@@ -9,6 +9,7 @@ class TransactionDestination:
     Args:
         amount (int): the amount of lovelaces to be sent
         address (str): the wallet address to send to
+        
     """
     def __init__(self, amount, address):
         self.amount = amount
@@ -61,6 +62,7 @@ class TransactionRequest:
 
     Returns:
         TransactionRequest
+        
     """
     def __init__(self, source=TransactionSource, destinations=[], grouping_policy="OptimizeForHighThroughput", spending_password=False):
         self.source = source
@@ -98,8 +100,10 @@ class TransactionResponse:
         direction (str): the direction of the transaction, incoming or outgoing
         confirmations (int): the amount of confirmations recieved
         type (int): the type of the transaction
+
     Returns:
         TransactionResponse
+        
     """
     def __init__(self, json):
 

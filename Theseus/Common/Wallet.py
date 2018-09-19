@@ -1,8 +1,8 @@
 class Wallet:
-    """ An object representing a Daedalus Wallet
+    """ An object representing a Wallet
 
     Args:
-        id (str): a daedalus ID for the wallet
+        id (str): a ID for the wallet
         name (str): the display name of the wallet
         passphrase(str): the recovery passphrase for the wallet
         balance(int): the current balance of the wallet
@@ -15,7 +15,9 @@ class Wallet:
 
     Notes:
         There are no setters on this object because it represents the state of the backend,
-        if you need to change values here use the api to change them in the backend.
+        The data can only be set via the constructor, if you need to change values here use 
+        the api to change them in the backend and create a new object
+        A wallet is a child of the wallet backend which is part of either Daedalus or Cardano.
 
     """
     def __init__(self, id, name, passphrase=False, balance=0, assurance="normal", spending_password=False, account=0):
@@ -51,5 +53,5 @@ class Wallet:
         return "{0} - {1}".format(self.name, self.balance)
 
     def dump(self):
-        template = "Daedalus Wallet\n\tName:{0}\n\tID:{1}\n\tPassphrase:{2}\n\tBalance:{3}\n\tSpendingPassword:{4}\n\tAssurance:{5}"
+        template = "Wallet\n\tName:{0}\n\tID:{1}\n\tPassphrase:{2}\n\tBalance:{3}\n\tSpendingPassword:{4}\n\tAssurance:{5}"
         return template.format(self._name, self._id, self._passphrase, self._assurance, self._spending_password, self._assurance)

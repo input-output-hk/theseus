@@ -1,7 +1,7 @@
-Daedalus Logging module
+Common.WalletAPI module
 =======================
 
-.. automodule:: Theseus.Daedalus.Logging
+.. automodule:: Theseus.Common.WalletAPI
     :members:
     :undoc-members:
     :show-inheritance:

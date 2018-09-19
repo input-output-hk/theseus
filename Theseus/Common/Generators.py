@@ -4,15 +4,18 @@ import mnemonic
 import string
 
 
-def generate_menmonic(language):
+def generate_mnemonic(language='english'):
     """ Generate Mnemonic: Creates insecure random nmemonics for testing
 
     Args:
         language (str): defaults to english , all bip languages are supported.
 
+    Returns:
+        (str): a list of mnemonic words separated by spaces
+
     Notes:
         These values MUST not be used for wallets with real ADA as they are
-        not securely generated and could be predictable.
+        not securely generated so could be predictable.
     """
     phrase_generator = mnemonic.Mnemonic(language)
 
@@ -22,6 +25,19 @@ def generate_menmonic(language):
 
     # make a phrase from it
     return phrase_generator.to_mnemonic(entropy)
+
+
+def check_mnemonic(string, language='english'):
+    """ Check menmonic: 
+
+    Uses the python mnemonic library to check the supplied mnemonic is complies to the BIP-0039 standards
+
+    Args:
+        string(str): a list of mnemonic words seperated by spaces to be checked
+        languge(str): a language to verify the mnemonic in , defaults to english
+    """
+    object = mnemonic.Mnemonic(language)
+    return object.check(string)
 
 
 def generate_walletname(evil=0, length=8):
@@ -36,6 +52,7 @@ def generate_walletname(evil=0, length=8):
         Python string constants are used to create the charecter lists
         https://docs.python.org/3.4/library/string.html
     """
+    string_options: str
     # configurable levels of evil content for wallet names
     if evil == 0:
         string_options = string.ascii_uppercase + string.digits

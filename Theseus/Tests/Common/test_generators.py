@@ -12,7 +12,7 @@ class TestTheseusGenerators(unittest2.TestCase):
 
         languages = ['english']
 
-        loops = range(100)
+        loops = range(50)
 
         all_mnemonics = {}
 
@@ -40,7 +40,7 @@ class TestTheseusGenerators(unittest2.TestCase):
         """ Generate a series of wallet names of varying lengths and evilness """
         evilness_modes = [0, 1, 2]
         lengths = [8, 256]
-        loops = range(100)
+        loops = range(5)
 
         for loop in loops:
             for length in lengths:

@@ -38,14 +38,14 @@ class TransactionSource:
         TransactionSource
 
     """
-    def __init__(self, account_id, wallet_id):
-        self.accountIndex = account_id
-        self.walletId = wallet_id
+    def __init__(self, accountIndex, walletId):
+        self.accountIndex = accountIndex
+        self.walletId = walletId
 
     def dump(self) -> str:
         """ Dump object to a string """
         template = "Cardano Transaction TransactionSource\n\tAccount ID:(0)\n\tWallet ID:{1}\n"
-        return template.format(self.account_id, self.wallet_id)
+        return template.format(self.accountIndex, self.walletId)
 
     def to_json(self) -> str:
         """ Dump object to a json formatted string """
@@ -64,20 +64,21 @@ class TransactionRequest:
         TransactionRequest
         
     """
-    def __init__(self, source=TransactionSource, destinations=[], grouping_policy="OptimizeForHighThroughput", spending_password=False):
+    def __init__(self, source=TransactionSource, destinations=[], groupingPolicy="OptimizeForHighThroughput", spendingPassword=''):
         self.source = source
         self.destinations = destinations
-        self.grouping_policy = grouping_policy
-        self.spending_password = spending_password
+        self.groupingPolicy = groupingPolicy
+        self.spendingPassword = spendingPassword
 
     def dump(self) -> str:
         """ Dump object to a string """
         template = "Cardano Transaction Request\n\tTransactionSource:(0)\n\tDestinations:{1}\n\tGrouping Policy:{2}\n\tSpending Password:{3}"
-        destinations_dumped =''
+
+        destinations_dumped = ''
         for dest in self.destinations:
             destinations_dumped += dest.to_json()
 
-        return template.format(self.source, destinations_dumped, self.grouping_policy, self.spending_password)
+        return template.format(self.source, destinations_dumped, self.groupingPolicy, self.spendingPassword)
 
     def to_json(self) -> str:
         """ Dump object to a json formatted string """
@@ -86,6 +87,8 @@ class TransactionRequest:
 
 class TransactionResponse:
     """ An object representing a Cardano transaction response
+
+    This data is returned as slice of the data array which may contain multiple transaction responses.
 
     Args:
         json (str): the raw json response

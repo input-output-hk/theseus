@@ -7,7 +7,7 @@ from Theseus.Common.Address import AddressResponse, AddressRequest
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Daedalus Testing functions'
-__all__ = ['Daedalus', 'Wallet', 'WalletAPI', 'get_logger', 'TransactionRequest', 'TransactionResponse', 'TransactionDestination',
+__all__ = ['Daedalus', 'Wallet', 'WalletAPI', 'TransactionRequest', 'TransactionResponse', 'TransactionDestination',
            'TransactionSource', 'AddressRequest', 'AddressResponse']
 
 

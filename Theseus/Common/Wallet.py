@@ -37,7 +37,7 @@ class Wallet(object):
         self.syncState = syncState
         self.createdAt = createdAt
         self.type = type
-        self.account = 0  # 2147483648  # TODO: this should not be hardcoded !
+        self.account = 0  # this will be overwritten
 
     #def add_account(self, account: Account):
     #    self.accounts.append(account)

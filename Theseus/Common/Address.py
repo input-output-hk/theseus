@@ -1,4 +1,6 @@
-from Theseus.Common import Wallet
+from Theseus.Common.Wallet import Wallet
+from Theseus.Common.Base import Request, Response
+
 import json
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
@@ -6,22 +8,18 @@ __doc__ = 'Common - Address objects'
 __any__ = ['AddressRequest', 'AddressResponse']
 
 
-class AddressRequest(object):
+class AddressRequest(Request):
     """ Address Request - a request to create a new address for a wallet  """
-    def __init__(self, wallet: Wallet, accountIndex):
-        self.accountIndex = accountIndex # 2147483648  # wallet.account   TODO: this should not be hardcoded !
+    def __init__(self, wallet: Wallet, accountIndex=int):
+        self.accountIndex = wallet.account[0].index or accountIndex
         self.walletId = wallet.id
         if wallet.spendingPassword:
             self.spendingPassword = wallet.spendingPassword
         else:
             self.spendingPassword = ''
 
-    def to_json(self) -> str:
-        """ Dump object to a JSON formatted string """
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
-
-class AddressResponse(object):
+class AddressResponse(Response):
     """ Address Response - a response from a request to create addresses """
     def __init__(self, json_data: str):
         self.data = {}

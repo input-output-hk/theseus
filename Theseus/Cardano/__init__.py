@@ -62,5 +62,5 @@ class Cardano(WalletAPI):
             self.logger.info("Poor wallet was imported")
             return True
         else:
-            self.logger.error("Error importing poor wallet: {0}".format(response.content))
+            self.logger.error("Error importing poor wallet: {0}".format(response.text))
             return False

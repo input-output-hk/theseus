@@ -79,7 +79,11 @@ class WalletAPI:
         # this is the wallet cache , a dict of Wallets keyed by name
         self._wallets = {}
 
+        # this is node info cache
+        self._node_info = dict
+
         self.logger.info('Connecting to WalletAPI')
+        self.get_node_info()
         self.fetch_wallet_list()
 
     def __del__(self):
@@ -274,21 +278,24 @@ class WalletAPI:
     def transact(self, transaction_request: TransactionRequest) -> TransactionResponse:
         """ Transact: sends your transaction request to the backend to make it happen
 
+        Send a transaction Request to the backend to make a transaction happen.
+
         Args:
             transaction_request (TransactionRequest) : A Transaction Request to enact
 
         Returns:
-            TransactionResponse: the tran
+            TransactionResponse: the transaction response
+
+        Notes:
+            You will allways get a transaction response object and the status code for the request will be logged.
+
         """
         url = "https://{0}:{1}/api/v{2}/transactions".format(self._host, self._port, self._version)
 
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers,
                                  data=transaction_request.to_json())
-
-        if response.status_code == 200:
-            return TransactionResponse(response.text)
-        else:
-            return TransactionResponse('{"status":"failed"}')
+        self.logger.info('Transaction request status code: {0}'.format(response.status_code))
+        return TransactionResponse(response.text)
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
         """ Create Address: creates a new receive address
@@ -298,15 +305,18 @@ class WalletAPI:
 
         Returns:
             AddressResponse: the Address response
+
+        Notes:
+            You will allways get a address response object and the status code for the request will be logged.
+            Look at the status field in the returned object to detect if the request worked.
         """
 
         url = "https://{0}:{1}/api/v{2}/addresses".format(self._host, self._port, self._version)
 
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=address_request.to_json())
-        if response.status_code == 200:
-            return AddressResponse(response.text)
-        else:
-            return AddressResponse('{"status":"error"}')
+        self.logger.info('Create address request status code: {0}'.format(response.status_code))
+
+        return AddressResponse(response.text)
 
     def get_accounts(self, wallet: Wallet):
         """ Get Accounts: get a list of accounts owned by a wallet
@@ -334,3 +344,21 @@ class WalletAPI:
 
             if raw_json['status'] == 'failure':
                 self.logger.error('Error fetching accounts: {0}'.format(response.error))
+
+    def get_node_info(self):
+        """" Fetch and log node info
+
+        This is run when we first connect to the node
+
+        You can access the data from it at self._node_info
+
+        The spec for this is here
+        https://cardanodocs.com/technical/wallet/api/v1/#tag/Info
+
+        """
+        url = "https://{0}:{1}/api/v{2}/node-info".format(self._host, self._port, self._version)
+        response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers)
+        if response.status_code == 200:
+            self._node_info = json.loads(response.text)
+            self.logger.info("Node info: \n {0}".format(json.dumps(self._node_info, default=lambda o: o.__dict__, sort_keys=True, indent=4)))
+

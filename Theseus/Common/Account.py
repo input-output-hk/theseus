@@ -1,32 +1,20 @@
-class Account:
-    """ An object representing a Wallet backend Account
 
-    An account may have multiple wallets and instance of wallet backend can have multiple accounts
+class Account:
+    """ An object representing an Account
+
+    An account is a child of a wallet may have multiple wallets and instance of wallet backend can have multiple accounts
 
     Args:
-        wallet_id (int): A wallet ID
-        account_id (int) : The account id for this account.
+        walletId (int): A wallet ID
+        accountId (int) : The account id for this account.
     """
-    def __init__(self, wallet_id: int, account_id: int=0):
-        self._wallet_id = wallet_id
-        self._account_id = account_id
-
-    @property
-    def wallet_id(self):
-        return self._wallet_id
-
-    @wallet_id.setter
-    def wallet_id(self, value):
-        self._wallet_id = value
-
-    @property
-    def account_id(self):
-        return self._account_id
-
-    @account_id.setter
-    def account_id(self, value):
-        self._account_id = value
+    def __init__(self, walletId, index, amount, name, addresses=[]):
+        self.walletId = walletId
+        self.index = index
+        self.addresses = addresses
+        self.amount = amount
+        self.name = name
 
     def dump(self):
-        template = "Account\n\tWallet_ID:{0}\n\tAccount_ID:{1}"
-        return template.format(self.account_id, self.wallet_id)
+        template = "Account\n\tWallet_ID:{0}\n\tAccount_ID:{1}\n\tName:{2}"
+        return template.format(self.index, self.walletId, self.name)

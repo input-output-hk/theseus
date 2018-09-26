@@ -13,4 +13,5 @@ __any__ = [
             'generate_mnemonic', 'check_mnemonic',  'generate_walletname',
             'TransactionDestination', 'TransactionSource', 'TransactionRequest', 'TransactionResponse',
             'Wallet', 'WalletAPI',
+            'Response', 'Request', 'Location'
            ]

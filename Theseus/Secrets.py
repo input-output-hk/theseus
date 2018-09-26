@@ -57,7 +57,8 @@ class Secrets:
         """ Overwrites current secrets storage with new data """
         json_data = 'error'
         try:
-            json_data = open(self._backing).read()
+            with open(self._backing) as secrets_file:
+                json_data = secrets_file.read()
         except Exception as e:
             self.logger.fatal('Error reading secrets file: {0}'.format(e))
 

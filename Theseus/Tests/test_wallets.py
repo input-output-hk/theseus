@@ -2,30 +2,34 @@ import time
 import typing
 import unittest2
 import shutil
+import nose
 
-from Theseus import Daedalus, Secrets, Wallet, generate_mnemonic, generate_walletname
+from Theseus import Daedalus, Secrets, Wallet, generate_mnemonic, generate_walletname, get_logger
 
 
 class TestWalletCreateDelete(unittest2.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.secrets = Secrets()
-        cls.username = cls.secrets.get('Daedalus')['username']
-        cls.host = cls.secrets.get('Daedalus')['host']
+        cls.daedalus = Daedalus(**cls.secrets.get('Daedalus'))
+    
+    def setUp(self):
+        self.logger = get_logger(self._testMethodName)
+        self.logger.info(self._testMethodName + ' - ' + self._testMethodDoc)
 
-        cls.daedalus = Daedalus(ssh_tunnel=True, username=cls.username, host=cls.host)
-        cls.logger = Daedalus.get_logger('hatred')
-
+    @unittest2.skip
     def test_01_delete_all_wallets(self):
+        """ Delete all wallets on this backend """
         for wallet in self.daedalus.wallets:
             self.logger.info("Deleting wallet: {0}".format(wallet))
             response = self.daedalus.delete_wallet(wallet)
             self.assertTrue(response, msg="wallet deleted")
 
     def test_02_create_wallets(self):
+        """ Create and Delete 5 wallets with alphannumeric names"""
         wallet_count = 5
         standoff = 3
-        for i in range(0, wallet_count):
+        for i in range(wallet_count):
             phrase = generate_mnemonic('english')
             walletname = generate_walletname()
 
@@ -39,13 +43,13 @@ class TestWalletCreateDelete(unittest2.TestCase):
             delete_response = self.daedalus.delete_wallet(wallet)
             self.assertTrue(delete_response, msg="wallet deleted successfully")
 
-    @unittest2.skip
     def test_03_create_evil_wallets(self):
-        wallet_count = 10
+        """ Create and Delete 5 wallets with complex characters in their names """
+        wallet_count = 5
         standoff = 3
-        for i in range(0, wallet_count):
-            phrase = Daedalus.generate_menmonic('english')
-            walletname = Daedalus.generate_walletname(evil=2)
+        for i in range(wallet_count):
+            phrase = generate_mnemonic('english')
+            walletname = generate_walletname(evil=1)
 
             wallet = self.daedalus.create_wallet(name=walletname, phrase=phrase)
             self.assertIsInstance(wallet, Wallet, msg="Made a wallet")

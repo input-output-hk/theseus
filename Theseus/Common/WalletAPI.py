@@ -1,5 +1,9 @@
 import json
-from typing import Dict, List, Iterable
+#from typing import Dict, List, Iterable
+import random
+# hack to stop urlib3 complaining when we turn off SSL warnings
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
 
 #  import only the specific parts of theseus we need
@@ -8,10 +12,7 @@ from Theseus.Common.Transaction import TransactionRequest, TransactionResponse
 from Theseus.Protocols.SSHTunnel import SSHTunnel
 from Theseus.Common.Address import AddressResponse, AddressRequest
 from Theseus import get_logger
-
-# hack to stop urlib3 complaining when we turn off SSL warnings
-import urllib3
-urllib3.disable_warnings()
+from Theseus.Common.Account import Account
 
 
 class WalletAPI:
@@ -75,18 +76,39 @@ class WalletAPI:
             # if we are tunneling the set the port to match the local_port of the ssh tunnel
             self._port = local_port
 
-        # this is the wallet cache , a Dict of Wallets
-        self._wallets = List[Wallet]
+        # this is the wallet cache , a dict of Wallets keyed by name
+        self._wallets = {}
+
+        # this is node info cache
+        self._node_info = dict
 
         self.logger.info('Connecting to WalletAPI')
+        self.get_node_info()
         self.fetch_wallet_list()
 
+    def __del__(self):
+        try:
+            if self.tunnel:
+                self.tunnel.server.shutdown()
+            else:
+                self.logger.info('SSH tunnel died of natural causes')
+        except Exception as e:
+            self.logger.error('Exception stopping ssh tunnel: {0}'.format(e))
+
     @property
-    def wallets(self) -> Iterable[Wallet]:
-        return self._wallets
+    def wallets(self):
+        for name in self._wallets.keys():
+            yield self._wallets[name]
+
+    def random_wallet(self):
+        if self._wallets.items():
+            return random.sample(list(self._wallets.values()), 1)[0]
+        else:
+            self.logger.info('No wallets in cache')
+            return False
 
     def get_logger(self, name):
-        get_logger(name)
+        return get_logger(name)
 
     def restore_wallet(self, name: str, phrase: str, password: str, assurance: str="strict") -> Wallet:
         """ Restore a Wallet: Restores a wallet via the daedalus api using the supplied credentials
@@ -146,12 +168,13 @@ class WalletAPI:
         if response.status_code == 201:
             response_data = response.json()
             if response_data['status'] == 'success':
-                response_payload = response_data['data']
                 if operation == 'restore':
+                    # Todo: watch the operation until the status is done , more important for restore ,
                     self.logger.info('Restore status: {0}'.format(response_data['data']['syncState']))
-                wallet = Wallet(id=response_payload['id'], name=name, passphrase=phrase,
-                                                 assurance=assurance, balance=response_payload['balance'])
-                self.wallets.append(wallet)
+
+                wallet = Wallet(**response_data['data'])
+                wallet.account = self.get_accounts(wallet)
+                self._wallets.update({wallet.name: wallet})
                 return wallet
 
     def delete_wallet(self, wallet: Wallet)-> bool:
@@ -174,41 +197,21 @@ class WalletAPI:
             self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
             return False
 
-    def import_wallet(self, wallet_number: int=0)-> bool:
-        """ Import Wallet: Import a poor wallet
-
-        This is only available on cardano nodes
-
-        Args:
-            wallet_number (int) : Poor Key number (0-11)
-
-        Returns:
-            boolean: True if wallet is was imported
-        """
-        url = " https://{0}:{1}/api/internal/import-wallet".format(self._host, self._port)
-        payload = dict(
-            filePath="state-demo/genesis-keys/generated-keys/poor/key{0}.sk".format(wallet_number)
-        )
-        self.logger.info("Importing Poor Wallet: {0}".format(wallet_number))
-        response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=json.dumps(payload))
-
-        if response.status_code == 200:
-            self.logger.info("Poor wallet was imported")
-            return True
-        else:
-            self.logger.error("Error importing poor wallet: {0}".format(response.content))
-            return False
-
     def delete_all_wallets(self) -> bool:
         """ Delete all the wallets: Deletes all the wallets from daedalus and the local wallet cache"""
-        try:
-            for wallet in self.wallets:
-                self.delete_wallet(wallet.id)
-            return True
-        except Exception:
-            return False
+        #try:
+        for name in self.wallets:
+            self.logger.info('Deleting wallet: {0}'.format(self._wallets[name]))
+            self.delete_wallet(self._wallets[name].id())
 
-    def fetch_wallet_list(self, id_filter: str="", balance_filter: str="", sort_by: str="", page: int=1, per_page: int=10)-> List[Wallet]:
+        # empty the wallet cache so its in sync
+        self._wallets = dict
+        return True
+        #except Exception as e:
+        #    self.logger.error('Delete all wallets: {0}'.format(e))
+        #    return False
+
+    def fetch_wallet_list(self, id_filter: str="", balance_filter: str="", sort_by: str="", page: int=1, per_page: int=50):
         """ Fetch a list of wallets: Queries the daedalus wallet and updates the local wallet cache
 
         Args:
@@ -216,13 +219,13 @@ class WalletAPI:
             balance_filter (str): Filter specification for wallet balances
             sort_by (str) : sort specification for wallet listing
             page (int) : which page of wallet listings to show, default 1
-            per_page(int) : how many listings to show on a page, default 10
+            per_page(int) : how many listings to show on a page, default 50
 
         Returns:
             List: a List of Daedalus.Wallet objects that where found
 
         Notes:
-            TODO: this only fetches 10 because its not using pagination yet
+            Defaults to fetching 100 wallets to avoid having to use using pagination
             Specification syntax can be found at https://cardanodocs.com/technical/wallet/api/v1/
 
         """
@@ -256,38 +259,43 @@ class WalletAPI:
             if id_filter or balance_filter or sort_by:
                 return wallets
             else:
-                self._wallets = []
+                self._wallets = {}
                 for wallet in wallets:
-                    fresh = Wallet(id=wallet['id'], name=wallet['name'], balance=wallet['balance'])
-                    self._wallets.append(fresh)
+                    # create a wallet object with all the values as kwargs, the keys match
+                    fresh = Wallet(**wallet)
+                    fresh.account = self.get_accounts(fresh)
+                    self._wallets.update({wallet['name']: fresh})
         else:
             self.logger.info('Wallet listed fetch failed: {0}'.format(response.status_code))
-            return List[Wallet]  # an empty list
+            return {}  # an empty dict
 
     def dump_wallets(self):
         """ Dump Wallets: dumps the contents of the wallet cache to the logs """
-        for wallet in self.wallets:
+        for name, wallet in self._wallets.items():
             self.logger.info('Wallet Cache Dump:')
             self.logger.info(wallet.dump())
 
     def transact(self, transaction_request: TransactionRequest) -> TransactionResponse:
         """ Transact: sends your transaction request to the backend to make it happen
 
+        Send a transaction Request to the backend to make a transaction happen.
+
         Args:
             transaction_request (TransactionRequest) : A Transaction Request to enact
 
         Returns:
-            TransactionResponse: the tran
+            TransactionResponse: the transaction response
+
+        Notes:
+            You will allways get a transaction response object and the status code for the request will be logged.
+
         """
         url = "https://{0}:{1}/api/v{2}/transactions".format(self._host, self._port, self._version)
 
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers,
                                  data=transaction_request.to_json())
-
-        if response.status_code == 200:
-            return TransactionResponse(response.text)
-        else:
-            return TransactionResponse("status:'failed'")
+        self.logger.info('Transaction request status code: {0}'.format(response.status_code))
+        return TransactionResponse(response.text)
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
         """ Create Address: creates a new receive address
@@ -296,14 +304,61 @@ class WalletAPI:
             address_request(AddressRequest): the address request
 
         Returns:
-            AddressResponse: the Address resposne
+            AddressResponse: the Address response
+
+        Notes:
+            You will allways get a address response object and the status code for the request will be logged.
+            Look at the status field in the returned object to detect if the request worked.
         """
 
         url = "https://{0}:{1}/api/v{2}/addresses".format(self._host, self._port, self._version)
 
-        response = requests.post(url, data=AddressRequest)
+        response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=address_request.to_json())
+        self.logger.info('Create address request status code: {0}'.format(response.status_code))
+
+        return AddressResponse(response.text)
+
+    def get_accounts(self, wallet: Wallet):
+        """ Get Accounts: get a list of accounts owned by a wallet
+
+        Args:
+            wallet (Wallet): Wallet to find the account of
+
+        Returns:
+            List of Accounts: a populated instance of Account
+
+        """
+
+        accounts = []
+
+        url = "https://{0}:{1}/api/v{2}/wallets/{3}/accounts".format(self._host, self._port, self._version, wallet.id)
+
+        response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers)
         if response.status_code == 200:
-            return AddressResponse(response.text)
-        else:
-            return AddressResponse('"status":"error"')
-        
+            raw_json = json.loads(response.text)
+            if raw_json['status'] == 'success':
+                # create objects of each of the accounts
+                for data in raw_json['data']:
+                    accounts.append(Account(**data))
+                return accounts
+
+            if raw_json['status'] == 'failure':
+                self.logger.error('Error fetching accounts: {0}'.format(response.error))
+
+    def get_node_info(self):
+        """" Fetch and log node info
+
+        This is run when we first connect to the node
+
+        You can access the data from it at self._node_info
+
+        The spec for this is here
+        https://cardanodocs.com/technical/wallet/api/v1/#tag/Info
+
+        """
+        url = "https://{0}:{1}/api/v{2}/node-info".format(self._host, self._port, self._version)
+        response = requests.get(url, verify=self._ssl_verify, headers=self.json_headers)
+        if response.status_code == 200:
+            self._node_info = json.loads(response.text)
+            self.logger.info("Node info: \n {0}".format(json.dumps(self._node_info, default=lambda o: o.__dict__, sort_keys=True, indent=4)))
+

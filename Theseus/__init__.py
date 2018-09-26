@@ -1,5 +1,6 @@
 # theseus internals
-from .Logging import log_to_console, log_to_file, get_logger, timestamp
+from .Logging import log_to_console, log_to_file, get_logger
+from .Time import timestamp, sleep
 from .Secrets import Secrets
 from .Protocols.SSHTunnel import SSHTunnel
 from .version import __version__, __build__
@@ -23,7 +24,8 @@ __all__ = ['Cardano', 'Daedalus',
            'AddressResponse', 'AddressRequest',
            'generate_mnemonic', 'check_mnemonic', 'generate_walletname',
            'Secrets', 'SSHTunnel',
-           'get_logger', 'timestamp']
+           'get_logger', 'log_to_console', 'log_to_file',
+           'timestamp', 'sleep']
 
 # dependencies for the rest of this file
 import atexit
@@ -32,6 +34,10 @@ import os
 import signal
 import sys
 import time
+
+# hack to stop urlib3 complaining when we turn off SSL warnings
+import urllib3
+urllib3.disable_warnings()
 
 
 def finish(reason=None):

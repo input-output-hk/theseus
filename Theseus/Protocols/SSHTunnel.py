@@ -5,6 +5,8 @@ import paramiko
 import socketserver as SocketServer
 import logging
 
+from Theseus import sleep
+
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'SSH Tunnel'
 __all__ = ['SSHTunnel']
@@ -31,6 +33,7 @@ class SSHTunnel:
 
     The tunnel will not accept passwords , you have to configure ssh keys in your OS underneath.
     This is much safer than putting login credentials in the tests.
+    Use the ssh-add command to add a key file to your ssh setup so it can be used by Theseus
 
     When you load this class the tunnel will be started and will run in a Thread.
     The Thread will run until either the connection drops or this the object goes out of scope.
@@ -234,6 +237,8 @@ class Handler(SocketServer.BaseRequestHandler):
             if self.server._BaseServer__is_shut_down.is_set():
                 self.logger.debug('Closing tunnel due to shutdown request.')
                 break
+            # let the thread give way
+            sleep(0)
 
         peername = self.request.getpeername()
         chan.close()

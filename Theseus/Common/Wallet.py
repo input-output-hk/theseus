@@ -1,4 +1,7 @@
-class Wallet:
+from Theseus.Common.Account import Account
+
+
+class Wallet(object):
     """ An object representing a Wallet
 
     Args:
@@ -9,49 +12,44 @@ class Wallet:
         assurance(str): the assurance level for security either strict or normal , defaults to normal
         spending_password (str): optional spending password
         account (str): the account this wallet is connected to , zero is unconnected.
-
+        hasSpendingPassword (bool): if a spending password is set
     Returns:
         a wallet object
 
     Notes:
-        There are no setters on this object because it represents the state of the backend,
-        The data can only be set via the constructor, if you need to change values here use 
-        the api to change them in the backend and create a new object
+        if you need to change values here use the api to change them in the backend and create a new object,
+        updating them if possible but changes will not be sent to the back end so its not worth it.
         A wallet is a child of the wallet backend which is part of either Daedalus or Cardano.
+        A wallet can have multiple child accounts
 
     """
-    def __init__(self, id, name, passphrase=False, balance=0, assurance="normal", spending_password=False, account=0):
-        self._id = id
-        self._name = name
-        self._passphrase = passphrase
-        self._balance = balance
-        self._assurance = assurance
-        self._spending_password = spending_password
-        self._account = account
+    def __init__(self, id, name, passphrase=False, balance=0, assuranceLevel="normal", spendingPassword=False,
+                 spendingPasswordLastUpdate=str, account=0, hasSpendingPassword=False, syncState={}, createdAt=str, type=str ):
+        self.id = id
+        self.name = name
+        self.passphrase = passphrase
+        self.balance = balance
+        self.assuranceLevel = assuranceLevel
+        self.spendingPassword = spendingPassword
+        self.account = account
+        self.spendingPasswordLastUpdate = spendingPasswordLastUpdate
+        self.hasSpendingPassword = hasSpendingPassword
+        self.syncState = syncState
+        self.createdAt = createdAt
+        self.type = type
+        self.account = 0  # this will be overwritten
 
-    @property
-    def id(self):
-        return self._id
+    #def add_account(self, account: Account):
+    #    self.accounts.append(account)
 
-    @property
-    def passphrase(self):
-        return self._passphrase
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def balance(self):
-        return self._balance
-
-    @property
-    def account(self):
-        return self._account
+    #def del_account(self, account: Account):
+    #    for check in self.accounts:
+    #        if check == account:
+    #            del check
 
     def __str__(self):
         return "{0} - {1}".format(self.name, self.balance)
 
     def dump(self):
-        template = "Wallet\n\tName:{0}\n\tID:{1}\n\tPassphrase:{2}\n\tBalance:{3}\n\tSpendingPassword:{4}\n\tAssurance:{5}"
-        return template.format(self._name, self._id, self._passphrase, self._assurance, self._spending_password, self._assurance)
+        template = "Wallet\n\tName:{0}\n\tID:{1}\n\tPassphrase:{2}\n\tBalance:{3}\n\tSpendingPassword:{4}\n\tAssurance:{5}\n\tAccounts:{6}"
+        return template.format(self.name, self.id, self.passphrase, self.balance, self.spendingPassword, self.assuranceLevel, self.account)

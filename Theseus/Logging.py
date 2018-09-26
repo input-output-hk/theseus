@@ -2,7 +2,7 @@ import logging
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Theseus - Logging Functions'
-__all__ = ['log_to_console', 'log_to_file', 'get_logger', 'timestamp']
+__all__ = ['log_to_console', 'log_to_file', 'get_logger']
 
 logger = logging.getLogger('theseus')
 
@@ -113,16 +113,3 @@ def log_to_file(filename, level=None, formatter=None):
         logger.addHandler(filehandler)
 
     return logger
-
-
-def timestamp():
-    """ Return human readable timestamp
-
-    Returns:
-        str: a time stamp representing the current date and time with microseconds
-
-    """
-    # import datetime
-    # return datetime.datetime.utcnow()
-    import time
-    return time.time()

@@ -2,6 +2,8 @@
 
 cd sphinx
 
-rm build
+rm build -rf
 
-make html
+PYTHONPATH=".." make html
+
+cd ..

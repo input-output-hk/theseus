@@ -18,7 +18,6 @@ import os
 
 import Theseus
 
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -41,14 +40,15 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'sphinx-autodoc-typehints'
 ]
 
 # napoleon settings
 napoleon_google_docstring = True
 napoleon_include_private_with_doc = False
 napoleon_use_admonition_for_notes = True
-napoleon_use_rtype = False
-
+napoleon_use_rtype = True
+napoleon_use_param = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

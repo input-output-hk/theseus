@@ -7,6 +7,7 @@ import nose
 from Theseus import Daedalus, Secrets, Wallet, generate_mnemonic, generate_walletname, get_logger
 
 
+@unittest2.skip('disabled destructive tests ')
 class TestWalletCreateDelete(unittest2.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,7 +22,6 @@ class TestWalletCreateDelete(unittest2.TestCase):
         self.logger = get_logger(self._testMethodName)
         self.logger.info(self._testMethodName + ' - ' + self._testMethodDoc)
 
-    @unittest2.skip
     def test_01_delete_all_wallets(self):
         """ Delete all wallets on this backend """
         for wallet in self.daedalus.wallets:

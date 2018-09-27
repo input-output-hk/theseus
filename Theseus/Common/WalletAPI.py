@@ -91,7 +91,7 @@ class WalletAPI:
             if self.tunnel:
                 self.tunnel.server.shutdown()
             else:
-                self.logger.info('SSH tunnel died of natural causes')
+                self.logger.info('SSH tunnel seems to have died of natural causes')
         except Exception as e:
             self.logger.error('Exception stopping ssh tunnel: {0}'.format(e))
 
@@ -251,7 +251,7 @@ class WalletAPI:
 
         if response.status_code == 200:
             wallet_data = response.json()
-            self.logger.info(wallet_data['data'])
+            self.logger.info('Fetched Wallet: ' + json.dumps(wallet_data['data'], default=lambda o: o.__dict__, sort_keys=True, indent=4))
             wallets = wallet_data['data']
             self.logger.info('Fetched data on {0} wallets'.format(len(wallets)))
 
@@ -346,7 +346,7 @@ class WalletAPI:
                 self.logger.error('Error fetching accounts: {0}'.format(response.error))
 
     def get_node_info(self):
-        """" Fetch and log node info
+        """ Get Node Information: Fetch and log node status info
 
         This is run when we first connect to the node
 

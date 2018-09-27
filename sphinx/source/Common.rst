@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     Common.Account
+    Common.Base
     Common.Generators
     Common.Transaction
     Common.Wallet

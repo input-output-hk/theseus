@@ -16,6 +16,11 @@
 import sys
 import os
 
+import Theseus
+import Theseus.Common
+import Theseus.Cardano
+import Theseus.Daedalus
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -67,7 +72,7 @@ copyright = 'IOHK 2018'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-import Theseus
+
 # The short X.Y version.
 version = "{0}({1})".format(Theseus.version(), Theseus.build())
 # The full version, including alpha/beta/rc tags.

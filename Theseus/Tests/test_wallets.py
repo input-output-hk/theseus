@@ -12,7 +12,11 @@ class TestWalletCreateDelete(unittest2.TestCase):
     def setUpClass(cls):
         cls.secrets = Secrets()
         cls.daedalus = Daedalus(**cls.secrets.get('Daedalus'))
-    
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.daedalus.tunnel.stop_tunnel()
+
     def setUp(self):
         self.logger = get_logger(self._testMethodName)
         self.logger.info(self._testMethodName + ' - ' + self._testMethodDoc)

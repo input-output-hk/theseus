@@ -46,12 +46,12 @@ class WalletAPI:
     """
     def __init__(self, host: str='127.0.0.1', port: int=8090, ssl_verify: bool=False, ssh_tunnel: bool=True,
                  username: str = '@', ssh_port: int=22, local_port: int=8090, remote_port: int=8090,
-                 local_host: str='127.0.0.1', remote_host: str='127.0.0.1', version: int = 1):
+                 local_host: str='127.0.0.1', remote_host: str='127.0.0.1', version: int = 1, automatic=True):
         self._host = host
         self._port = port
 
         self._ssl_verify = ssl_verify
-
+        self._automatic = automatic
         self._ssh_tunnel = ssh_tunnel
         self._username = username
         self._local_port = local_port
@@ -82,9 +82,11 @@ class WalletAPI:
         # this is node info cache
         self._node_info = dict
 
-        self.logger.info('Connecting to WalletAPI')
-        self.get_node_info()
-        self.fetch_wallet_list()
+        # automatically populate wallet cache and get node info
+        if self._automatic:
+            self.logger.info('Connecting to WalletAPI')
+            self.get_node_info()
+            self.fetch_wallet_list()
 
     def __del__(self):
         try:
@@ -165,17 +167,30 @@ class WalletAPI:
 
         self.logger.debug('Wallet {0} returned: {1}'.format(operation, response.status_code))
 
-        if response.status_code == 201:
-            response_data = response.json()
-            if response_data['status'] == 'success':
-                if operation == 'restore':
-                    # Todo: watch the operation until the status is done , more important for restore ,
-                    self.logger.info('Restore status: {0}'.format(response_data['data']['syncState']))
+        # handle error conditions by returning an error wallet
+        if response.status_code == 400:
+            return Wallet(id=str(response.status_code), type="error", name="Invalid body in request")
 
-                wallet = Wallet(**response_data['data'])
-                wallet.account = self.get_accounts(wallet)
-                self._wallets.update({wallet.name: wallet})
-                return wallet
+        if response.status_code == 415:
+            return Wallet(id=str(response.status_code), type="error", name="Unsupported Media Type")
+
+        if response.status_code == 406:
+            return Wallet(id=str(response.status_code), type="error", name="Invalid Charset")
+
+        # we should now be safe to process the json
+        response_data = response.json()
+        if response_data['status'] == 'success':
+            if operation == 'restore':
+                # Todo: watch the operation until the status is done , more important for restore ,
+                self.logger.info('Restore status: {0}'.format(response_data['data']['syncState']))
+
+            wallet = Wallet(**response_data['data'])
+            wallet.account = self.get_accounts(wallet)
+            self._wallets.update({wallet.name: wallet})
+            return wallet
+
+        if response_data['status'] == 'failure':
+            return Wallet(id=response.status_code, type='error', name="Wallet creation failed in the backend")
 
     def delete_wallet(self, wallet: Wallet)-> bool:
         """ Delete a wallet: Deletes a wallet from daedalus

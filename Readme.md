@@ -20,16 +20,15 @@ WIP
    * Faucet withdrawals and returns  
    
 Coming soon:
-   * remote installation of Daedalus
+   * remote installation
 
 **How do i use it ?**
 
 Heres a basic example of some code to create an arbitrary amount of wallets on a local node
 
     import Theseus
-    import Daedalus
 
-    daedalus = daedalus.API()
+    daedalus = Theseus.Daedalus()
 
     for i in range(0, wallet_count):
         phrase = generate_menmonic('english')
@@ -44,15 +43,14 @@ This will connect to a local instance on 127.0.0.1:8090.
 
 If you want to control a remote installation an ssh tunnel will be created automatically.
 
-    daedaus.API(host='remotehost' port=1234)
+    daedaus(host='remotehost' port=1234)
 
         
 **Is there documentation**
 
 Yes , there is inline documentation with the code , it can be extracted with sphinx to make external documentation.
 
-     cd sphinx
-     make html
+    scripts/make_documentation.sh
      
  Your documentation will be viewable at ***sphinx/build/html/index.html***
      
@@ -66,9 +64,10 @@ is similar to a jar file in that its a zip of the files with a little bit of mag
 
 ***Build the egg***
 
-    python3 setup.py bdist_egg
+    scripts/make_egg_file.sh
     
-An egg file should be made in the dist folder, eventually this wil be a CI process.
+An egg file should be made in the dist folder
+This is what happens on the CI server 
 
 ***Install the eggs and dependencies***
 
@@ -83,3 +82,4 @@ An egg file should be made in the dist folder, eventually this wil be a CI proce
   This will install the dependencies of the egg file and make it availble for use.
   
     python3 easy_install -f "path/to/file.egg"
+

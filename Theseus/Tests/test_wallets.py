@@ -1,5 +1,4 @@
 import time
-import typing
 import unittest2
 import shutil
 import nose

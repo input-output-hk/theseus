@@ -11,7 +11,9 @@ __any__ = ['AddressRequest', 'AddressResponse']
 class AddressRequest(Request):
     """ Address Request - a request to create a new address for a wallet  """
     def __init__(self, wallet: Wallet, accountIndex=int):
-        self.accountIndex = wallet.account[0].index or accountIndex
+        if wallet.account.__sizeof__() > 0:
+            accountIndex = wallet.account[0].index
+        self.accountIndex = accountIndex
         self.walletId = wallet.id
         if wallet.spendingPassword:
             self.spendingPassword = wallet.spendingPassword

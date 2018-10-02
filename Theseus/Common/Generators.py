@@ -2,6 +2,8 @@ import os
 import random
 import mnemonic
 import string
+from pyblake2 import blake2b
+import base58
 
 
 def generate_mnemonic(language='english'):
@@ -62,3 +64,31 @@ def generate_walletname(evil=0, length=8):
         string_options = string.printable
 
     return ''.join(random.choices(string_options, k=length))
+
+
+def encode_spending_password(string):
+    """" Create a blake2 hash and base58 encode it for use as a spending password
+
+    Args:
+        string(str): a string to encode as a password
+
+    Returns:
+          bytes: base58 encoding string
+    """
+
+    # might need to do some padding
+    bl = blake2b(string.encode('utf-8'), digest_size=24)
+    return base58.b58encode(bl.digest())
+
+
+def generate_spending_password(evil=0, length=16):
+    """" Generate a spending password and encode it
+
+    Args:
+        evil (int): 1 = alphanumeric , 2 = punctuation , 3 = any printable charecter
+        length (int): length of wallet name
+
+    Returns:
+        bytes: base58 encoded password
+    """
+    return encode_spending_password(generate_walletname(evil=evil, length=length))

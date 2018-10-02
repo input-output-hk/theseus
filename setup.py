@@ -23,7 +23,7 @@ setup(
     author='amias.channer@iohk.io',
     author_email='amias.channer@iohk.io',
     description='a system for orchestrating tests for IOHK projects',
-    install_requires=['typing', 'mnemonic', 'requests', 'urllib3', 'paramiko', 'unittest2', 'sphinx', 'nose', 'nose_xunitmp'],
+    install_requires=['typing', 'mnemonic', 'pyblake2', 'base58', 'requests', 'urllib3', 'paramiko', 'unittest2', 'sphinx', 'nose', 'nose_xunitmp'],
     zip_safe=True
 )
 

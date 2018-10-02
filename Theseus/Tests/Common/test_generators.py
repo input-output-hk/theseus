@@ -38,7 +38,7 @@ class TestTheseusGenerators(unittest2.TestCase):
 
     def test_generate_walletname(self):
         """ Generate a series of wallet names of varying lengths and evilness """
-        evilness_modes = [0, 1, 2]
+        evilness_modes = [0]
         lengths = [8, 256]
         loops = range(5)
 
@@ -49,3 +49,21 @@ class TestTheseusGenerators(unittest2.TestCase):
                     self.logger.info("Testing: evil:{0} length:{1} loop:{2} \n name:{3}".format(mode, length, loop, name))
                     self.assertIsInstance(name, str, msg="Wallet name is a string")
                     self.assertEqual(len(name), length, msg="string is the right length")
+
+    def test_generate_spending_passwords(self):
+        """ Generate a series of spending passwords of varying lengths and evilness """
+        evilness_modes = [0]
+        lengths = [8, 256]
+        loops = range(100)
+
+        for loop in loops:
+            for length in lengths:
+                for mode in evilness_modes:
+                    name = Theseus.generate_walletname(evil=mode, length=length)
+                    pw = Theseus.encode_spending_password(name)
+                    self.logger.info("Testing: evil:{0} length:{1} loop:{2} name:{3}".format(mode, length, loop, name))
+                    self.assertIsInstance(pw, bytes, msg="Password is stored in bytes")
+                    self.logger.info("hash: ({0}) {1}".format(len(pw), pw))
+                    #self.assertEqual(len(pw), 64,  msg="Password is 32 hex pairs long")
+
+

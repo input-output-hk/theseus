@@ -10,7 +10,7 @@ from .Common.Transaction import TransactionRequest, TransactionResponse, Transac
 from .Common.Address import AddressRequest, AddressResponse
 from .Common.Wallet import Wallet
 from .Common.WalletAPI import WalletAPI
-from .Common.Generators import generate_mnemonic, check_mnemonic, generate_walletname
+from .Common.Generators import generate_mnemonic, check_mnemonic, generate_walletname, generate_spending_password, encode_spending_password
 
 # composed objects representing key parts of cardano
 from .Cardano import Cardano
@@ -22,7 +22,7 @@ __all__ = ['Cardano', 'Daedalus',
            'Wallet', 'WalletAPI',
            'TransactionRequest', 'TransactionResponse', 'TransactionDestination', 'TransactionSource',
            'AddressResponse', 'AddressRequest',
-           'generate_mnemonic', 'check_mnemonic', 'generate_walletname',
+           'generate_mnemonic', 'check_mnemonic', 'generate_walletname', 'generate_spending_password', 'encode_spending_password'
            'Secrets', 'SSHTunnel',
            'get_logger', 'log_to_console', 'log_to_file',
            'timestamp', 'sleep']

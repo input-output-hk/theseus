@@ -147,6 +147,9 @@ class WalletAPI:
 
         Notes:
             The created wallet object will also be appended to the local wallet cache.
+            The accounts data will be fetched for this wallet automatically
+            To check the status of the operation properly you need to read the status field of the wallet
+            in the event of an error you the status will be 'error', the ID will be a status code and the name will be an error message
         """
         # make payload structure for request
         payload = dict(
@@ -225,9 +228,6 @@ class WalletAPI:
         # empty the wallet cache so its in sync
         self._wallets = dict
         return True
-        #except Exception as e:
-        #    self.logger.error('Delete all wallets: {0}'.format(e))
-        #    return False
 
     def fetch_wallet_list(self, id_filter: str="", balance_filter: str="", sort_by: str="", page: int=1, per_page: int=50):
         """ Fetch a list of wallets: Queries the daedalus wallet and updates the local wallet cache
@@ -240,7 +240,7 @@ class WalletAPI:
             per_page(int) : how many listings to show on a page, default 50
 
         Returns:
-            List: a List of Daedalus.Wallet objects that where found
+            Dict: a Dict of Daedalus.Wallet objects that where found keyed by ID
 
         Notes:
             Defaults to fetching 100 wallets to avoid having to use using pagination
@@ -267,25 +267,30 @@ class WalletAPI:
         except ConnectionRefusedError as e:
             self.logger.error('Connection Refused: {0} check the details and the ssh tunnel make sense'.format(e))
 
+        self.logger.info('Wallet listing request status code: {0}'.format(response.status_code))
+        if response.status_code == 400:
+            self.logger.error('Error: {0}'.format(response.text))
+            return {}
+
         if response.status_code == 200:
             wallet_data = response.json()
             self.logger.info('Fetched Wallet: ' + json.dumps(wallet_data['data'], default=lambda o: o.__dict__, sort_keys=True, indent=4))
             wallets = wallet_data['data']
             self.logger.info('Fetched data on {0} wallets'.format(len(wallets)))
 
-            # if we have filters don't update the cache , its a user query
+            temp_wallets = {}
+            for wallet in wallets:
+                # create a wallet object with all the values as kwargs, the keys match
+                fresh = Wallet(**wallet)
+                fresh.account = self.get_accounts(fresh)
+                temp_wallets.update({wallet['id']: fresh})
+
             if id_filter or balance_filter or sort_by:
-                return wallets
+                # if we have filters don't update the cache , its a user query
+                return temp_wallets
             else:
-                self._wallets = {}
-                for wallet in wallets:
-                    # create a wallet object with all the values as kwargs, the keys match
-                    fresh = Wallet(**wallet)
-                    fresh.account = self.get_accounts(fresh)
-                    self._wallets.update({wallet['name']: fresh})
-        else:
-            self.logger.error('Error: {0}'.format(response.text))
-            return {}  # an empty dict
+                self._wallets = temp_wallets
+                return temp_wallets
 
     def dump_wallets(self):
         """ Dump Wallets: dumps the contents of the wallet cache to the logs """
@@ -384,38 +389,48 @@ class WalletAPI:
             self._node_info = json.loads(response.text)
             self.logger.info("Node info: \n {0}".format(json.dumps(self._node_info, default=lambda o: o.__dict__, sort_keys=True, indent=4)))
 
-    def update_wallet(self, id, wallet: Wallet):
+    def update_wallet(self, id, assuranceLevel=None, name=None):
         """ Update the wallet with correspending ID in the backend to match the supplied wallet object
 
         Args:
             id(str): the wallet ID to update
-            wallet(Wallet): the wallet object to apply
-
+            assuranceLevel(str): the assuranceLevel to apply
+            name(str): the name to apply
         Returns:
             Wallet: updated wallet in sync with the backend.
 
         """
         # fetch wallet with unique ID , will be first in list
-        wallet_to_update = self.fetch_wallet_list(id_filter=id)[0]
+        wallets = self.fetch_wallet_list(id_filter=id)
+        wallet_to_update = wallets[id]
 
-        # loop through fields of the supplied wallet (except ID) ,
-        for field in wallet.__dict__.items():
-            # don't copy the ID field
-            if field == 'id':
-                if wallet_to_update.id == wallet.id:
-                    continue
-                else:
-                    # if ID's don't match this is not the right wallet
-                    # TODO: handle this more gracefully
-                    break
+        url = "https://{0}:{1}/api/v{2}/wallets/{3}".format(self._host, self._port, self._version, id)
+        update = {}
 
-            if field in ['assuranceLevel', 'name']:
-                wallet_to_update[field] = wallet[field]
+        if assuranceLevel and wallet_to_update.assuranceLevel != assuranceLevel:
+            update['assuranceLevel'] = assuranceLevel
+        else:
+            update['assuranceLevel'] = wallet_to_update.assuranceLevel
 
+        if name and wallet_to_update.name != name:
+            update['name'] = name
+        else:
+            update['name'] = wallet_to_update.name
 
-        #   copy data
-        #   update field on backend
-        # fetch updated wallet
-        # compare with requested (except ID , timestamps ?)
-        # return updated wallet
+        #  update field on backend
+        response = requests.put(url, verify=self._ssl_verify, headers=self.json_headers, data=json.dumps(update))
+        self.logger.info('Update wallet request status code: {0}'.format(response.status_code))
+        if response.status_code == 400:
+            self.logger.error('Error: {0}'.format(response.text))
+
+        if response.status_code == 200:
+            parsed = response.json()
+            if parsed['status'] == 'success':
+                # if its successful
+                return Wallet(**parsed['data'])
+
+            if parsed['status'] in ['failed', 'error']:
+                self.logger.error('Error updating wallet: {0}'.format(response.text))
+                return Wallet(id=str(response.status_code), type="error", name=response.reason)
+
 

@@ -23,7 +23,7 @@ class Request(Data):
 class Response(Data):
     def __bool__(self):
         """ Allow this object to return true of false based on the status field """
-        if self.status == 'error':
+        if self.status in ['error', 'failure']:
             return False
         else:
             return True

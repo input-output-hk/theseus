@@ -169,12 +169,15 @@ class WalletAPI:
 
         # handle error conditions by returning an error wallet
         if response.status_code == 400:
+            self.logger.error('Error: {0}'.format(response.text))
             return Wallet(id=str(response.status_code), type="error", name="Invalid body in request")
 
         if response.status_code == 415:
+            self.logger.error('Error: {0}'.format(response.text))
             return Wallet(id=str(response.status_code), type="error", name="Unsupported Media Type")
 
         if response.status_code == 406:
+            self.logger.error('Error: {0}'.format(response.text))
             return Wallet(id=str(response.status_code), type="error", name="Invalid Charset")
 
         # we should now be safe to process the json
@@ -281,7 +284,7 @@ class WalletAPI:
                     fresh.account = self.get_accounts(fresh)
                     self._wallets.update({wallet['name']: fresh})
         else:
-            self.logger.info('Wallet listed fetch failed: {0}'.format(response.status_code))
+            self.logger.error('Error: {0}'.format(response.text))
             return {}  # an empty dict
 
     def dump_wallets(self):
@@ -310,6 +313,8 @@ class WalletAPI:
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers,
                                  data=transaction_request.to_json())
         self.logger.info('Transaction request status code: {0}'.format(response.status_code))
+        if response.status_code == 400:
+            self.logger.error('Error: {0}'.format(response.text))
         return TransactionResponse(response.text)
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
@@ -330,6 +335,8 @@ class WalletAPI:
 
         response = requests.post(url, verify=self._ssl_verify, headers=self.json_headers, data=address_request.to_json())
         self.logger.info('Create address request status code: {0}'.format(response.status_code))
+        if response.status_code == 400:
+            self.logger.error('Error: {0}'.format(response.text))
 
         return AddressResponse(response.text)
 
@@ -376,4 +383,39 @@ class WalletAPI:
         if response.status_code == 200:
             self._node_info = json.loads(response.text)
             self.logger.info("Node info: \n {0}".format(json.dumps(self._node_info, default=lambda o: o.__dict__, sort_keys=True, indent=4)))
+
+    def update_wallet(self, id, wallet: Wallet):
+        """ Update the wallet with correspending ID in the backend to match the supplied wallet object
+
+        Args:
+            id(str): the wallet ID to update
+            wallet(Wallet): the wallet object to apply
+
+        Returns:
+            Wallet: updated wallet in sync with the backend.
+
+        """
+        # fetch wallet with unique ID , will be first in list
+        wallet_to_update = self.fetch_wallet_list(id_filter=id)[0]
+
+        # loop through fields of the supplied wallet (except ID) ,
+        for field in wallet.__dict__.items():
+            # don't copy the ID field
+            if field == 'id':
+                if wallet_to_update.id == wallet.id:
+                    continue
+                else:
+                    # if ID's don't match this is not the right wallet
+                    # TODO: handle this more gracefully
+                    break
+
+            if field in ['assuranceLevel', 'name']:
+                wallet_to_update[field] = wallet[field]
+
+
+        #   copy data
+        #   update field on backend
+        # fetch updated wallet
+        # compare with requested (except ID , timestamps ?)
+        # return updated wallet
 

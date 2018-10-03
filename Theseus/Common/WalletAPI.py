@@ -212,15 +212,18 @@ class WalletAPI:
 
         """
         url = "https://{0}:{1}/api/v{2}/wallets/{3}".format(self._host, self._port, self._version, wallet.id)
-        self.logger.info("Deleting wallet: {0}".format(wallet.name))
+        self.logger.info("Deleting wallet: {0} {1}".format(wallet.name, url))
         response = requests.delete(url, verify=self._ssl_verify, headers=self.json_headers)
 
         if response.status_code == 204:
             self.logger.info("Wallet deleted: {0}".format(wallet.name))
             return True
-        else:
-            self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
+        if response.status_code == 404:
+            self.logger.error("Walled deletion: ID not found")
             return False
+
+        self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
+        return False
 
     def delete_all_wallets(self) -> bool:
         """ Delete all the wallets: Deletes all the wallets from daedalus and the local wallet cache"""

@@ -129,6 +129,7 @@ class WalletAPI:
 
         Notes:
             The created wallet object will also be appended to the local wallet cache.
+
         """
         return self.create_wallet(name, phrase, password, assurance, operation='restore')
 
@@ -142,6 +143,7 @@ class WalletAPI:
             password (str): optional spending password
             assurance (str): assurance level strict or normal
             operation (str): create or restore , defaults to create
+
         Returns:
             Daedalus.Wallet object
 
@@ -150,6 +152,7 @@ class WalletAPI:
             The accounts data will be fetched for this wallet automatically
             To check the status of the operation properly you need to read the status field of the wallet
             in the event of an error you the status will be 'error', the ID will be a status code and the name will be an error message
+
         """
         # make payload structure for request
         payload = dict(
@@ -206,17 +209,21 @@ class WalletAPI:
 
         Returns:
             boolean : True if wallet was deleted.
+
         """
         url = "https://{0}:{1}/api/v{2}/wallets/{3}".format(self._host, self._port, self._version, wallet.id)
-        self.logger.info("Deleting wallet: {0}".format(wallet.name))
+        self.logger.info("Deleting wallet: {0} {1}".format(wallet.name, url))
         response = requests.delete(url, verify=self._ssl_verify, headers=self.json_headers)
 
         if response.status_code == 204:
             self.logger.info("Wallet deleted: {0}".format(wallet.name))
             return True
-        else:
-            self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
+        if response.status_code == 404:
+            self.logger.error("Walled deletion: ID not found")
             return False
+
+        self.logger.info("Wallet deletion failed: {0} returned {1}".format(wallet.name, response.status_code))
+        return False
 
     def delete_all_wallets(self) -> bool:
         """ Delete all the wallets: Deletes all the wallets from daedalus and the local wallet cache"""
@@ -334,6 +341,7 @@ class WalletAPI:
         Notes:
             You will allways get a address response object and the status code for the request will be logged.
             Look at the status field in the returned object to detect if the request worked.
+
         """
 
         url = "https://{0}:{1}/api/v{2}/addresses".format(self._host, self._port, self._version)
@@ -396,6 +404,7 @@ class WalletAPI:
             id(str): the wallet ID to update
             assuranceLevel(str): the assuranceLevel to apply
             name(str): the name to apply
+
         Returns:
             Wallet: updated wallet in sync with the backend.
 

@@ -1,7 +1,7 @@
 Common.Account Module
 ======================
 
-.. automodule:: Common.Account
+.. automodule:: Theseus.Common.Account
     :members:
     :undoc-members:
     :show-inheritance:

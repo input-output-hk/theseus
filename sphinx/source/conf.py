@@ -37,17 +37,21 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'sphinx_autodoc_napoleon_typehints',
+    'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
+    'sphinx_autodoc_annotation',
 ]
+
 
 # napoleon settings
 napoleon_google_docstring = True
 napoleon_include_private_with_doc = False
 napoleon_use_admonition_for_notes = True
-napoleon_use_rtype = True
-napoleon_use_param = True
+napoleon_use_rtype = False
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

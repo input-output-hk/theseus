@@ -36,7 +36,7 @@ class TransactionRequest(Request):
     Args:
         source (TransactionSource): the id of the wallet from whence to source the payment
         destinations (list): a list of destinations for the payment
-        grouping_policy (str):
+        grouping_policy(str): the grouping policy to apply to the transaction
 
     Returns:
         TransactionRequest
@@ -69,21 +69,13 @@ class TransactionResponse(Response):
 
     Members:
         transaction_id (str): the transactions unique identifier
-
         creation_time (str) : the creation timestamp
-
         status (list) : the statuses of the transaction
-
         amount (int): the value of the transaction
-
         inputs (list): a list of transaction inputs
-
         outputs (list): a list of transaction outputs
-
         direction (str): the direction of the transaction, incoming or outgoing
-
         confirmations (int): the amount of confirmations recieved
-
         type (int): the type of the transaction
 
     Returns:

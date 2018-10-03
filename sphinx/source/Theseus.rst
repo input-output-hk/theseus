@@ -39,6 +39,7 @@ Subpackages
     Logging
     Protocols
     Secrets
+    Time
 
 Module contents
 ---------------

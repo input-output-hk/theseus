@@ -6,6 +6,8 @@ from .Protocols.SSHTunnel import SSHTunnel
 from .version import __version__, __build__
 
 # common parts of the cardano system
+from .Common.Base import Request, Response, Source, Destination, Data
+from .Common.Account import Account
 from .Common.Transaction import TransactionRequest, TransactionResponse, TransactionDestination, TransactionSource
 from .Common.Address import AddressRequest, AddressResponse
 from .Common.Wallet import Wallet
@@ -18,14 +20,19 @@ from .Daedalus import Daedalus
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Theseus Automated Test Framework'
-__all__ = ['Cardano', 'Daedalus',
-           'Wallet', 'WalletAPI',
+__all__ = [
+           'Secrets', 'Time', 'SSHTunnel',
+           'get_logger', 'log_to_console', 'log_to_file',
+           'timestamp', 'sleep',
+           'Request', 'Response', 'Source', 'Destination', 'Data',
+           'Account',
            'TransactionRequest', 'TransactionResponse', 'TransactionDestination', 'TransactionSource',
            'AddressResponse', 'AddressRequest',
-           'generate_mnemonic', 'check_mnemonic', 'generate_walletname', 'generate_spending_password', 'encode_spending_password'
-           'Secrets', 'SSHTunnel',
-           'get_logger', 'log_to_console', 'log_to_file',
-           'timestamp', 'sleep']
+           'Wallet', 'WalletAPI',
+           'generate_mnemonic', 'check_mnemonic', 'generate_walletname', 'generate_spending_password',
+           'encode_spending_password',
+           'Cardano', 'Daedalus',
+           ]
 
 # dependencies for the rest of this file
 import atexit

@@ -1,4 +1,9 @@
 
+__author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
+__doc__ = 'Common - Account'
+__any__ = ['Account']
+
+
 class Account:
     """ An object representing an Account
 

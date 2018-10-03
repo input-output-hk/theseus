@@ -2,7 +2,7 @@ import json
 
 __author__ = 'Amias Channer <amias.channer@iohk.io> for IOHK'
 __doc__ = 'Common - Base classes'
-__any__ = ['Request', 'Response', 'Source', 'Destination']
+__any__ = ['Request', 'Response', 'Source', 'Destination', 'Data']
 
 
 class Data(object):

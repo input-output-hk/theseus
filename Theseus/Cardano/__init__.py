@@ -30,6 +30,7 @@ class Cardano(WalletAPI):
 
         Returns:
             (logging) : A logging handle
+
         """
         if key:
             # enforce our logging prefix
@@ -50,6 +51,7 @@ class Cardano(WalletAPI):
 
         Returns:
             boolean: True if wallet is was imported
+
         """
         url = " https://{0}:{1}/api/internal/import-wallet".format(self._host, self._port)
         payload = dict(

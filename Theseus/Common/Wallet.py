@@ -1,4 +1,3 @@
-from Theseus.Common.Account import Account
 
 
 class Wallet(object):
@@ -9,10 +8,11 @@ class Wallet(object):
         name (str): the display name of the wallet
         passphrase(str): the recovery passphrase for the wallet
         balance(int): the current balance of the wallet
-        assurance(str): the assurance level for security either strict or normal , defaults to normal
-        spending_password (str): optional spending password
+        assuranceLevel(str): the assurance level for security either strict or normal , defaults to normal
+        spendingPassword (str): optional spending password
         account (str): the account this wallet is connected to , zero is unconnected.
         hasSpendingPassword (bool): if a spending password is set
+        spendingPasswordLastUpdate(str): when password was last updated
     Returns:
         a wallet object
 

@@ -23,7 +23,7 @@ __doc__ = 'Theseus Automated Test Framework'
 __all__ = [
            'Secrets', 'Time', 'SSHTunnel',
            'get_logger', 'log_to_console', 'log_to_file',
-           'timestamp', 'sleep'
+           'timestamp', 'sleep',
            'Request', 'Response', 'Source', 'Destination', 'Data',
            'Account',
            'TransactionRequest', 'TransactionResponse', 'TransactionDestination', 'TransactionSource',

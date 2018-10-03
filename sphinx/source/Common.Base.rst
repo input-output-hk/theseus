@@ -1,7 +1,7 @@
 Common.Base Module
 ==================
 
-.. automodule:: Common.Base
+.. automodule:: Theseus.Common.Base
     :members:
     :undoc-members:
     :show-inheritance:

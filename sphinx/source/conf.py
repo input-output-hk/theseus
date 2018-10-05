@@ -41,7 +41,6 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_autodoc_napoleon_typehints',
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
     'sphinx_autodoc_annotation',
 ]
 

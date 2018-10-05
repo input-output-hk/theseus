@@ -26,7 +26,7 @@ class TransactionSource(Source):
     """
     def dump(self) -> str:
         """ Dump object to a string """
-        template = "Cardano TransactionSource\n\tAccount ID:(0)\n\tWallet ID:{1}\n"
+        template = "Cardano TransactionSource\n\tAccount ID:{0}\n\tWallet ID:{1}\n"
         return template.format(self.accountIndex, self.walletId)
 
 
@@ -50,7 +50,7 @@ class TransactionRequest(Request):
 
     def dump(self) -> str:
         """ Dump object to a string """
-        template = "Cardano Transaction Request\n\tTransactionSource:(0)\n\tDestinations:{1}\n\tGrouping Policy:{2}\n\tSpending Password:{3}"
+        template = "Cardano Transaction Request\n\tTransactionSource:{0}\n\tDestinations:{1}\n\tGrouping Policy:{2}\n\tSpending Password:{3}"
 
         destinations_dumped = ''
         for dest in self.destinations:
@@ -99,7 +99,7 @@ class TransactionResponse(Response):
     def from_json(self, raw_json):
         """ Populate this object with data from a json"""
         parsed_json = json.loads(raw_json)
-        if parsed_json['status'] in ['error','failed']:
+        if parsed_json['status'] in ['error', 'failed']:
             logger = get_logger('TransactionResponse')
             logger.error("Transaction Error: {0}".format(raw_json))
         else:

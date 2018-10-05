@@ -39,7 +39,6 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'sphinx_autodoc_napoleon_typehints',
     'sphinx.ext.autodoc',
     'sphinx_autodoc_annotation',
 ]

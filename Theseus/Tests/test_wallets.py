@@ -61,3 +61,4 @@ class TestWalletCreateDelete(unittest2.TestCase):
 
             delete_response = self.daedalus.delete_wallet(wallet)
             self.assertTrue(delete_response, msg="wallet deleted successfully")
+

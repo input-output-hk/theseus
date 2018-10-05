@@ -1,6 +1,7 @@
+from Theseus.Common.Base import Data
 
 
-class Wallet(object):
+class Wallet(Data):
     """ An object representing a Wallet
 
     Args:

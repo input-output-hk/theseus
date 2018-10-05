@@ -195,7 +195,7 @@ class WalletAPI:
 
             wallet = Wallet(**response_data['data'])
             wallet.account = self.get_accounts(wallet)
-            self._wallets.update({wallet.name: wallet})
+            self._wallets.update({wallet.id: wallet})
             return wallet
 
         if response_data['status'] == 'failure':

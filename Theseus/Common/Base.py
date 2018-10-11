@@ -9,6 +9,7 @@ class Data(object):
     """ A base class for any classes handling data from or for the API
 
     This class is subclassed by Request , Response , Source and Destination
+
     """
     def to_json(self) -> str:
         """ Dump object to a JSON formatted string

@@ -99,17 +99,33 @@ class WalletAPI:
 
     @property
     def wallets(self):
+        """" A Generator that iterates through the wallet cache"""
         for name in self._wallets.keys():
             yield self._wallets[name]
 
-    def random_wallet(self):
+    def random_wallet(self) -> Wallet:
+        """" Random Wallet: Chooses a random wallet from the wallet cache
+
+        Returns:
+            Theseus.Wallet: a random wallet or an error wallet.
+
+        """
         if self._wallets.items():
             return random.sample(list(self._wallets.values()), 1)[0]
         else:
             self.logger.info('No wallets in cache')
-            return False
+            return Wallet(id='empty', type='error', name='no wallets in cache')
 
     def get_logger(self, name):
+        """ Get Logger: get a logger handle with the right prefixes
+
+        Args:
+            name(str): the name of your logger handle
+
+        Returns:
+            logger: a Logger object
+
+        """
         return get_logger(name)
 
     def restore_wallet(self, name: str, phrase: str, password: str, assurance: str="strict") -> Wallet:
@@ -292,7 +308,10 @@ class WalletAPI:
                 fresh.account = self.get_accounts(fresh)
                 temp_wallets.update({wallet['id']: fresh})
 
-            if id_filter or balance_filter or sort_by:
+            if id_filter:
+                return temp_wallets[id_filter]
+
+            if balance_filter or sort_by:
                 # if we have filters don't update the cache , its a user query
                 return temp_wallets
             else:
@@ -339,7 +358,7 @@ class WalletAPI:
             AddressResponse: the Address response
 
         Notes:
-            You will allways get a address response object and the status code for the request will be logged.
+            You will always get a address response object and the status code for the request will be logged.
             Look at the status field in the returned object to detect if the request worked.
 
         """

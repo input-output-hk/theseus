@@ -429,8 +429,7 @@ class WalletAPI:
 
         """
         # fetch wallet with unique ID , will be first in list
-        wallets = self.fetch_wallet_list(id_filter=id)
-        wallet_to_update = wallets[id]
+        wallet_to_update = self.fetch_wallet_list(id_filter=id)
 
         url = "https://{0}:{1}/api/v{2}/wallets/{3}".format(self._host, self._port, self._version, id)
         update = {}
